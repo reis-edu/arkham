@@ -1,0 +1,5 @@
+class AddFullNameToMedicaments < ActiveRecord::Migration[6.0]
+  def change
+    add_column :medicaments, :fullname, :string
+  end
+end
