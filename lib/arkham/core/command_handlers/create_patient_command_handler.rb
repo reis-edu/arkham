@@ -20,7 +20,7 @@ module Core
       private
 
       def raise_patient_existent_error
-        raise Errors::Patient::PatientAlreadyExistsError
+        raise Errors::Patient::PatientAlreadyExistsError, "Patient with this CPF already exists!"
       end
     end
   end
