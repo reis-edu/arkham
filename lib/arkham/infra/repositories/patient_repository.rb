@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Infra
   module Repositories
     class PatientRepository
@@ -15,4 +17,3 @@ module Infra
     end
   end
 end
-

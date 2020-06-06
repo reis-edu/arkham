@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Patient, type: :model do
-
   describe 'Validations' do
     it 'Create a Patient' do
       patient = build(:patient)
@@ -24,5 +25,4 @@ RSpec.describe Patient, type: :model do
       expect(patient).to be_invalid
     end
   end
-
 end

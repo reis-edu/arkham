@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-
   factory :patient, class: 'Patient' do
     firstname      { 'Pedra' }
     lastname       { 'Cerode' }
@@ -15,7 +14,7 @@ FactoryBot.define do
     photo_url      { 'http://www.photo.com.br' }
 
     trait :with_medicament_managements do
-      after(:build) do |p, evaluator|
+      after(:build) do |p, _evaluator|
         create_list(:medicament_management, 2, patient: p)
       end
     end

@@ -1,5 +1,6 @@
+# frozen_string_literal: true
+
 class ApplicationController < ActionController::Base
-  
   rescue_from Api::Errors::SchemaValidationError do |validation_error|
     render_unprocessable_entity(validation_error.errors)
   end
@@ -13,5 +14,4 @@ class ApplicationController < ActionController::Base
   def render_unprocessable_entity(error_message)
     render json: { detail: error_message }, status: :unprocessable_entity
   end
-
 end

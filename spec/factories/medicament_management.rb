@@ -1,5 +1,6 @@
-FactoryBot.define do
+# frozen_string_literal: true
 
+FactoryBot.define do
   factory :medicament_management, class: 'MedicamentManagement' do
     quantity        { 50 }
     unit_quantity   { 'mg' }
@@ -8,5 +9,4 @@ FactoryBot.define do
     patient         { Patient.first || association(:patient) }
     medicament      { Medicament.first || build(:medicament) }
   end
-
 end

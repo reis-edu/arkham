@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Core
   module CommandHandlers
     class CreatePatientCommandHandler
@@ -20,7 +22,7 @@ module Core
       private
 
       def raise_patient_existent_error
-        raise Errors::Patient::PatientAlreadyExistsError, "Patient with this CPF already exists!"
+        raise Errors::Patient::PatientAlreadyExistsError, 'Patient with this CPF already exists!'
       end
     end
   end

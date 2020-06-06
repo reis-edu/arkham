@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class Patient < ApplicationRecord
-  has_many :medicament_managements, :dependent => :destroy
+  has_many :medicament_managements, dependent: :destroy
   has_many :medicaments, through: :medicament_managements
 
   validates :firstname,    presence: true
@@ -9,13 +11,11 @@ class Patient < ApplicationRecord
 
   validates_uniqueness_of :cpf
 
-  attr_reader :age, :fullname
-
   def age
-    Date.today.year - self.birth_date.year
+    Date.today.year - birth_date.year
   end
 
   def fullname
-    "#{self.firstname} #{self.lastname}"
+    "#{firstname} #{lastname}"
   end
 end

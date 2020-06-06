@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Api
   class PatientsController < ApplicationController
- 
     def index
       render json: { status: 'OK' }
     end
@@ -17,6 +18,5 @@ module Api
     def permitted_params
       params.require(:patient).permit!
     end
-
   end
 end
