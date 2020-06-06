@@ -1,0 +1,11 @@
+{
+  "firstname": "Pedra",
+  "lastname": "Cerode",
+  "cpf": "628.506.300-14",
+  "gender": "female",
+  "diagnosis": "Trombose",
+  "sus": "861 6785 2888 0009",
+  "rg": "22.390.795-9",
+  "admission_date": "2001-12-10",
+  "birth_date": "1932-05-14"
+}
