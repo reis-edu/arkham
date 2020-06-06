@@ -1,8 +1,7 @@
 module Core
   module Errors
     module Patient
-      class PatientAlreadyExistsError < StandardError
-      end
+      class PatientAlreadyExistsError < StandardError; end
     end
   end
 end

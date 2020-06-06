@@ -1,6 +1,10 @@
 class ApplicationController < ActionController::Base
- 
-  rescue_from StandardError do |error|
+  
+  rescue_from Api::Errors::SchemaValidationError do |validation_error|
+    render_unprocessable_entity(validation_error.errors)
+  end
+
+  rescue_from Core::Errors::Patient::PatientAlreadyExistsError do |error|
     render_unprocessable_entity(error.message)
   end
 

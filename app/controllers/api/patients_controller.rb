@@ -6,14 +6,10 @@ module Api
     end
 
     def create
-      if patient_params.success?
-        command = Core::Commands::CreatePatientCommand.new(patient: @patient_params.output)
-        patient_id = Core::CommandHandlers::CreatePatientCommandHandler.new.create_patient(command)
+      command = Core::Commands::CreatePatientCommand.new(patient_params: permitted_params.to_h)
+      patient_id = Core::CommandHandlers::CreatePatientCommandHandler.new.create_patient(command)
 
-        render json: { id: patient_id }
-      else
-        render json: { detail: @patient_params.errors }, status: :precondition_failed
-      end
+      render json: { id: patient_id }
     end
 
     private
