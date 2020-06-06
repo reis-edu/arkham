@@ -3,9 +3,11 @@
 FactoryBot.define do
 
   factory :patient, class: 'Patient' do
-    name           { 'Pedra Serode' }
+    firstname      { 'Pedra' }
+    lastname       { 'Cerode' }
     sus            { '123456784343' }
-    cpf            { '123.456.123-12' }
+    cpf            { '628.506.300-14' }
+    gender         { 'female' }
     rg             { '12.123.123-2' }
     birth_date     { DateTime.new(1928, 10, 15) }
     diagnosis      { 'Diabetes' }

@@ -14,8 +14,8 @@ RSpec.describe Patient, type: :model do
       expect(patient.medicaments.length).to be_equal(2)
     end
 
-    it 'Create a Patient without name attribute' do
-      patient = build(:patient, name: nil)
+    it 'Create a Patient without firstname attribute' do
+      patient = build(:patient, firstname: nil)
       expect(patient).to be_invalid
     end
 
