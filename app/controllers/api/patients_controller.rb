@@ -14,10 +14,6 @@ module Api
 
     private
 
-    def patient_params
-      @patient_params ||= Api::PatientSchema.call(permitted_params.to_h)
-    end
-
     def permitted_params
       params.require(:patient).permit!
     end
