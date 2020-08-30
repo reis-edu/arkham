@@ -3,7 +3,7 @@
 module Api
   class PatientsController < ApplicationController
     def index
-      render json: { status: 'OK' }
+      @patients = list_patients
     end
 
     def create
@@ -14,6 +14,14 @@ module Api
     end
 
     private
+
+    def list_patients
+      Api::Patient::FinderService.find_patients(patient_find_params)
+    end
+
+    def patient_find_params
+      params.permit(:id, :status)
+    end
 
     def permitted_params
       params.require(:patient).permit!
