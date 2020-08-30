@@ -12,6 +12,7 @@ RSpec.describe Api::PatientsController, type: :controller do
       it 'should be success!' do
         subject
         expect(response.status).to eq(200)
+        expect(JSON.parse(response.body)['id']).should_not be_nil
       end
     end
 
@@ -31,6 +32,20 @@ RSpec.describe Api::PatientsController, type: :controller do
         create(:patient)
         subject
         expect(response.status).to eq(422)
+      end
+    end
+  end
+
+  describe 'GET #index' do
+    context 'when everything goes well' do
+      subject { get :index, format: :json }
+
+      render_views
+      it 'should be success!' do
+        create(:patient)
+        subject
+        expect(response.status).to eq(200)
+        expect(JSON.parse(response.body)['patients'].count).to be 1
       end
     end
   end
