@@ -1,0 +1,24 @@
+defaults: &defaults
+  firebase:
+    project_id: 'arkham-aad75'
+    auth_file_path: 'arkham-firebase-key.json'
+    bucket: 'staging.arkham-aad75.appspot.com'
+    profile_path: 'profiles'
+    profile_image_format: 'png'
+    acl: 'public_read'
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults
+  firebase:
+    project_id: 'arkham-aad75'
+    auth_file_path: 'arkham-firebase-key.json'
+    bucket: 'arkham-aad75.appspot.com'
+    profile_path: 'profiles'
+    profile_image_format: 'png'
+    acl: 'public_read'

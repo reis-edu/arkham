@@ -1,37 +1,77 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'google/cloud/storage'
 
 RSpec.describe Api::PatientsController, type: :controller do
   describe 'POST #create' do
     patient = JSON.parse(File.read('spec/fixtures/patient/patient.json'))
 
-    context 'when everything goes well' do
-      subject { post :create, params: { patient: patient } }
+    context 'when payload has no photo', :vcr do
+      context 'and everything goes well' do
+        subject { post :create, params: { patient: patient } }
 
-      it 'should be success!' do
-        subject
-        expect(response.status).to eq(200)
-        expect(JSON.parse(response.body)['id']).should_not be_nil
+        it 'is success!' do
+          subject
+          expect(response.status).to eq(200)
+          expect(JSON.parse(response.body)['id']).should_not be_nil
+        end
+      end
+
+      context 'and payload received has invalid attributes' do
+        subject { post :create, params: { patient: patient.reject { |k, _v| k == 'firstname' } } }
+
+        it 'fails!' do
+          subject
+          expect(response.status).to eq(422)
+        end
+      end
+
+      context 'and there is already a patient with the same CPF' do
+        subject { post :create, params: { patient: patient } }
+
+        it 'fails!' do
+          create(:patient)
+          subject
+          expect(response.status).to eq(422)
+        end
       end
     end
 
-    context 'when payload received has invalid attributes' do
-      subject { post :create, params: { patient: patient.reject { |k, _v| k == 'firstname' } } }
+    context 'when payload has photo', :vcr do
+      base64_image = File.open('spec/images/arkham.jpg', 'rb', &:read)
+      patient['photo'] = {
+        'photo_base64': base64_image,
+        'photo_base64_format': 'png'
+      }
 
-      it 'should fail!' do
-        subject
-        expect(response.status).to eq(422)
+      context 'and everything goes well' do
+        subject { post :create, params: { patient: patient } }
+
+        it 'it success!' do
+          storage_file_instance = double(Google::Cloud::Storage::File, id: '123abc', public_url: '')
+          allow_any_instance_of(Google::Cloud::Storage::Bucket)
+            .to receive(:create_file).and_return(storage_file_instance)
+
+          subject
+          expect(response.status).to eq(200)
+          expect(JSON.parse(response.body)['id']).should_not be_nil
+          expect(Patient.find(JSON.parse(response.body)['id']).photo_url).to eq nil
+        end
       end
-    end
 
-    context 'when there is already a patient with the same CPF' do
-      subject { post :create, params: { patient: patient } }
+      context 'and payload photo has missing attributes' do
+        patient['photo'] = {
+          'photo_base64_format': 'png'
+        }
+        subject { post :create, params: { patient: patient } }
 
-      it 'should fail!' do
-        create(:patient)
-        subject
-        expect(response.status).to eq(422)
+        it 'creates patient without photo' do
+          subject
+          expect(response.status).to eq(200)
+          expect(JSON.parse(response.body)['id']).should_not be_nil
+          expect(Patient.find(JSON.parse(response.body)['id']).photo_url).to eq nil
+        end
       end
     end
   end
@@ -41,7 +81,7 @@ RSpec.describe Api::PatientsController, type: :controller do
       subject { get :index, format: :json }
 
       render_views
-      it 'should be success!' do
+      it 'is success!' do
         create(:patient)
         subject
         expect(response.status).to eq(200)

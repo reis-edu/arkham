@@ -13,10 +13,5 @@ module Api
     optional(:birth_date).filled(:date?)
     optional(:created_at).filled(:date_time?)
     optional(:updated_at).filled(:date_time?)
-
-    optional(:photo).schema do
-      optional(:photo_url).filled(:str?)
-      optional(:photo_key).filled(:str?)
-    end
   end
 end

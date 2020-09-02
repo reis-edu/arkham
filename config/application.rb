@@ -9,6 +9,20 @@ require 'rails/all'
 Bundler.require(*Rails.groups)
 
 module Arkham
+  class ArkhamSettings < Settingslogic
+    source 'config/arkham.yml'
+    namespace Rails.env
+    suppress_errors true
+  end
+
+  def self.config
+    ArkhamSettings
+  end
+
+  def self.logger
+    Rails.logger
+  end
+
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.0
