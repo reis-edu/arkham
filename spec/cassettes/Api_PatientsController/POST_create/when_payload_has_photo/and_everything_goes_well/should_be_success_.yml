@@ -1,0 +1,138 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://oauth2.googleapis.com/token
+    body:
+      encoding: ASCII-8BIT
+      string: grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay1vb3E1dEBhcmtoYW0tYWFkNzUuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJhdWQiOiJodHRwczovL29hdXRoMi5nb29nbGVhcGlzLmNvbS90b2tlbiIsImV4cCI6MTU5OTA2NzY0MSwiaWF0IjoxNTk5MDY3NTIxLCJzY29wZSI6Imh0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL2F1dGgvZGV2c3RvcmFnZS5mdWxsX2NvbnRyb2wifQ.LbA9IPkDODjfV2q9i1iT9hQDqIsrdlnpbpln7jNju15787kl9WxnH5K_qAqamNd0W1Qgatkg2uTnay4yXrJGO5txznpI3NhkLl911pesPmpDU5xmEIa9ALHK9UWzmZAbb-dKbTexCJuw2u3XPT0jAl1XFwBWQpiJQ303S22WuJm1fJpgLxguRg50bdHJ2YCwJNc85b4C8ctKK5bbWwSML5fxy_Sp4DGQUuKX0i3VPV51g3PtM1xtE5WN4JIuqEzwwtbDf8v1Wm9TFI_qjrEyi4badgDWgesuH9Z5zSo74upHq-7I-Df1k2h3LO4w21hCzgVbRCGvywGWh4ZHpK_60A
+    headers:
+      User-Agent:
+      - Faraday v1.0.1
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Wed, 02 Sep 2020 17:26:21 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      Cache-Control:
+      - private
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Alt-Svc:
+      - h3-29=":443"; ma=2592000,h3-27=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-T050=":443";
+        ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+        ma=2592000,quic=":443"; ma=2592000; v="46,43"
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: '{"access_token":"ya29.c.Ko8B2gfm2Hh66A3kOg8lCp9Z2fylg4f7PdNIIsQ0pd2LLJn4lPcdAFmsuV5-sERajO6a6Tiboq2ZQZAxxchX8rvzkRA3Xqc_CSnNYPLboub5ygo9mo5WdWJMKCBPbWzChffnodPa2i6oeu0svFPVgGN0B3X2fReSxvoyfRMGCJD5J70JJGiGCWNWp0K-OkMYfKk","expires_in":3599,"token_type":"Bearer"}'
+  recorded_at: Wed, 02 Sep 2020 17:26:21 GMT
+- request:
+    method: get
+    uri: https://storage.googleapis.com/storage/v1/b/staging.arkham-aad75.appspot.com
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - gcloud-ruby/1.28.0 google-api-ruby-client/0.43.0 Linux/5.4.0-42-generic (gzip)
+      Accept:
+      - "*/*"
+      Date:
+      - Wed, 02 Sep 2020 17:26:21 GMT
+      X-Goog-Api-Client:
+      - gl-ruby/2.6.3 gccl/1.28.0
+      Accept-Encoding:
+      - gzip
+      Authorization:
+      - Bearer ya29.c.Ko8B2gfm2Hh66A3kOg8lCp9Z2fylg4f7PdNIIsQ0pd2LLJn4lPcdAFmsuV5-sERajO6a6Tiboq2ZQZAxxchX8rvzkRA3Xqc_CSnNYPLboub5ygo9mo5WdWJMKCBPbWzChffnodPa2i6oeu0svFPVgGN0B3X2fReSxvoyfRMGCJD5J70JJGiGCWNWp0K-OkMYfKk
+      Content-Type:
+      - application/x-www-form-urlencoded
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Guploader-Uploadid:
+      - ABg5-UwkgkBWywWVxoWelFP5P43PmuGR1iDL3IzedrRyjNqEfA9TMHWZaXMB1E23WC5fVQ5uOtgz6DY7nLholFrLKa4GHh0Prg
+      Etag:
+      - CAE=
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Wed, 02 Sep 2020 17:26:22 GMT
+      Vary:
+      - Origin
+      - X-Origin
+      Cache-Control:
+      - private, max-age=0, must-revalidate, no-transform
+      Expires:
+      - Wed, 02 Sep 2020 17:26:22 GMT
+      Content-Length:
+      - '776'
+      Server:
+      - UploadServer
+      Alt-Svc:
+      - h3-29=":443"; ma=2592000,h3-27=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-T050=":443";
+        ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+        ma=2592000,quic=":443"; ma=2592000; v="46,43"
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "kind": "storage#bucket",
+          "selfLink": "https://www.googleapis.com/storage/v1/b/staging.arkham-aad75.appspot.com",
+          "id": "staging.arkham-aad75.appspot.com",
+          "name": "staging.arkham-aad75.appspot.com",
+          "projectNumber": "525017335400",
+          "metageneration": "1",
+          "location": "US",
+          "storageClass": "STANDARD",
+          "etag": "CAE=",
+          "timeCreated": "2020-08-30T23:44:39.100Z",
+          "updated": "2020-08-30T23:44:39.100Z",
+          "lifecycle": {
+            "rule": [
+              {
+                "action": {
+                  "type": "Delete"
+                },
+                "condition": {
+                  "age": 15
+                }
+              }
+            ]
+          },
+          "iamConfiguration": {
+            "bucketPolicyOnly": {
+              "enabled": false
+            },
+            "uniformBucketLevelAccess": {
+              "enabled": false
+            }
+          },
+          "locationType": "multi-region"
+        }
+  recorded_at: Wed, 02 Sep 2020 17:26:22 GMT
+recorded_with: VCR 6.0.0
