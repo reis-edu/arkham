@@ -2,6 +2,10 @@
 
 module Api
   class PatientsController < ApplicationController
+    def initialize(repositories = {})
+      @patient_repository = repositories.fetch(:patient) { Infra::Repositories::PatientRepository.new }
+    end
+
     def index
       @patients = list_patients
     end
@@ -11,6 +15,20 @@ module Api
       patient_id = Core::CommandHandlers::CreatePatientCommandHandler.new.create_patient(command)
 
       render json: { id: patient_id }
+    end
+
+    def activate
+      patient = @patient_repository.find_by_id(params[:id])
+      @patient_repository.activate!(patient)
+
+      render json: { id: patient.id }
+    end
+
+    def inactivate
+      patient = @patient_repository.find_by_id(params[:id])
+      @patient_repository.inactivate!(patient)
+
+      render json: { id: patient.id }
     end
 
     private

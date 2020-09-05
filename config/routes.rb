@@ -5,5 +5,7 @@ Rails.application.routes.draw do
 
   namespace :api, defaults: { format: 'json' } do
     resources :patients, only: %i[index create]
+    post '/patients/:id/activate',      to: 'patients#activate'
+    post '/patients/:id/inactivate',    to: 'patients#inactivate'
   end
 end
