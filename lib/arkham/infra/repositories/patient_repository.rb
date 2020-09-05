@@ -11,6 +11,14 @@ module Infra
         patient.save
       end
 
+      def activate!(patient)
+        patient.update(status: 'active')
+      end
+
+      def inactivate!(patient)
+        patient.update(status: 'inactive')
+      end
+
       def find_by_id(id)
         @patient.find_by(id: id)
       end

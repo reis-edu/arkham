@@ -4,6 +4,21 @@ require 'rails_helper'
 require 'google/cloud/storage'
 
 RSpec.describe Api::PatientsController, type: :controller do
+
+  describe 'GET #index' do
+    context 'when everything goes well' do
+      subject { get :index, format: :json }
+
+      render_views
+      it 'is success!' do
+        create(:patient)
+        subject
+        expect(response.status).to eq(200)
+        expect(JSON.parse(response.body)['patients'].count).to be 1
+      end
+    end
+  end
+
   describe 'POST #create' do
     patient = JSON.parse(File.read('spec/fixtures/patient/patient.json'))
 
@@ -15,6 +30,7 @@ RSpec.describe Api::PatientsController, type: :controller do
           subject
           expect(response.status).to eq(200)
           expect(JSON.parse(response.body)['id']).should_not be_nil
+          expect(Patient.find(JSON.parse(response.body)['id']).active?).to be true
         end
       end
 
@@ -76,16 +92,26 @@ RSpec.describe Api::PatientsController, type: :controller do
     end
   end
 
-  describe 'GET #index' do
+  describe 'POST #activate' do
     context 'when everything goes well' do
-      subject { get :index, format: :json }
+      it 'updates patient status to active' do
+        patient = create(:patient, status: 'inactive')
+        post :activate, params: { id: patient.id }
 
-      render_views
-      it 'is success!' do
-        create(:patient)
-        subject
         expect(response.status).to eq(200)
-        expect(JSON.parse(response.body)['patients'].count).to be 1
+        expect(Patient.find(JSON.parse(response.body)['id']).active?).to be true
+      end
+    end
+  end
+
+  describe 'POST #inactivate' do
+    context 'when everything goes well' do      
+      it 'updates patient status to inactive' do
+        patient = create(:patient)
+        post :inactivate, params: { id: patient.id }
+
+        expect(response.status).to eq(200)
+        expect(Patient.find(JSON.parse(response.body)['id']).active?).to be false
       end
     end
   end
