@@ -22,17 +22,7 @@ class PatientPhoto
     @photo_url = firebase_image.public_url
   end
 
-  def valid?
-    return false if invalid_photo?
-
-    true
-  end
-
   private
-
-  def invalid_photo?
-    @base64_image.nil? || @base64_image.empty? || @patient_id.nil? || @patient_id.empty?
-  end
 
   def file_path
     "#{Arkham.config.firebase['profile_path']}/#{patient_id}.#{base64_image_format}"

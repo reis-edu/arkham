@@ -11,6 +11,10 @@ module Infra
         patient.save
       end
 
+      def update(patient, attributes)
+        patient.update(attributes)
+      end
+
       def activate!(patient)
         patient.update(status: 'active')
       end

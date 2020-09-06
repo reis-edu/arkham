@@ -4,7 +4,6 @@ require 'rails_helper'
 require 'google/cloud/storage'
 
 RSpec.describe Api::PatientsController, type: :controller do
-
   describe 'GET #index' do
     context 'when everything goes well' do
       subject { get :index, format: :json }
@@ -70,6 +69,7 @@ RSpec.describe Api::PatientsController, type: :controller do
             .to receive(:create_file).and_return(storage_file_instance)
 
           subject
+
           expect(response.status).to eq(200)
           expect(JSON.parse(response.body)['id']).should_not be_nil
           expect(Patient.find(JSON.parse(response.body)['id']).photo_url).to eq nil
@@ -92,6 +92,63 @@ RSpec.describe Api::PatientsController, type: :controller do
     end
   end
 
+  describe 'PUT #update' do
+    context 'when everything goes well', :vcr do
+      payload = {
+        lastname: 'Cedore2',
+        diagnosis: 'Trombose',
+        photo: {}
+      }
+
+      it 'updates patient attributes' do
+        patient = create(:patient)
+        put :update, params: { id: patient.id, patient: payload }
+
+        expect(response.status).to eq(200)
+        expect(patient.reload.lastname).to eq('Cedore2')
+        expect(patient.reload.diagnosis).to eq('Trombose')
+      end
+    end
+
+    context 'and photo is updated' do
+      base64_image = File.open('spec/images/arkham.jpg', 'rb', &:read)
+      payload = {
+        lastname: 'Cedore2',
+        diagnosis: 'Trombose',
+        photo: {
+          photo_base64: base64_image,
+          photo_base64_format: 'png'
+        }
+      }
+
+      it 'updates patient attributes and patient photo', :vcr do
+        patient = create(:patient)
+        storage_file_instance = double(Google::Cloud::Storage::File, id: '123abc', public_url: '')
+        allow_any_instance_of(Google::Cloud::Storage::Bucket)
+          .to receive(:create_file).and_return(storage_file_instance)
+
+        put :update, params: { id: patient.id, patient: payload }
+
+        expect(response.status).to eq(200)
+        expect(patient.reload.lastname).to eq('Cedore2')
+        expect(patient.reload.diagnosis).to eq('Trombose')
+      end
+    end
+
+    context 'when patient is not found' do
+      payload = {
+        lastname: 'Cedore2',
+        diagnosis: 'Trombose'
+      }
+
+      it 'renders 404' do
+        put :update, params: { id: '123', patient: payload }
+
+        expect(response.status).to eq(404)
+      end
+    end
+  end
+
   describe 'POST #activate' do
     context 'when everything goes well' do
       it 'updates patient status to active' do
@@ -102,16 +159,32 @@ RSpec.describe Api::PatientsController, type: :controller do
         expect(Patient.find(JSON.parse(response.body)['id']).active?).to be true
       end
     end
+
+    context 'when patient is not found' do
+      it 'renders 404' do
+        post :activate, params: { id: '123' }
+
+        expect(response.status).to eq(404)
+      end
+    end
   end
 
   describe 'POST #inactivate' do
-    context 'when everything goes well' do      
+    context 'when everything goes well' do
       it 'updates patient status to inactive' do
         patient = create(:patient)
         post :inactivate, params: { id: patient.id }
 
         expect(response.status).to eq(200)
         expect(Patient.find(JSON.parse(response.body)['id']).active?).to be false
+      end
+    end
+
+    context 'when patient is not found' do
+      it 'renders 404' do
+        post :inactivate, params: { id: '123' }
+
+        expect(response.status).to eq(404)
       end
     end
   end
