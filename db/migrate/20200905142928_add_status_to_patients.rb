@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class AddStatusToPatients < ActiveRecord::Migration[6.0]
   def change
-    add_column :patients, :status, :string, default: "active"
+    add_column :patients, :status, :string, default: 'active'
   end
 end

@@ -2,7 +2,7 @@
 
 module Core
   module CommandHandlers
-    class CreatePatientCommandHandler
+    class UpdatePatientCommandHandler
       def initialize(repositories = {})
         @patient_repository = repositories.fetch(:patient) { Infra::Repositories::PatientRepository.new }
         @patient_photo_repository = repositories.fetch(:patient_photo) do
@@ -10,18 +10,18 @@ module Core
         end
       end
 
-      def execute(create_patient_command)
-        patient = Patient.new(create_patient_command.patient)
-        raise_patient_existent_error if Patient.exists?(cpf: patient.cpf)
+      def execute(command)
+        patient = @patient_repository.find_by_id(command.id)
+        raise ActiveRecord::RecordNotFound unless patient
 
         ActiveRecord::Base.transaction do
-          @patient_repository.save(patient)
-          patient_photo = PatientPhoto.new(patient.id, create_patient_command.patient_photo[:photo_base64],
-                                           create_patient_command.patient_photo[:photo_base64_format])
+          @patient_repository.update(patient, command.patient)
+          patient_photo = PatientPhoto.new(patient.id, command.patient_photo[:photo_base64],
+                                           command.patient_photo[:photo_base64_format])
           if @patient_photo_repository.valid?(patient_photo)
             save_patient_photo(patient_photo, patient)
           else
-            log_photo_error(patient.id, create_patient_command.patient_photo)
+            log_photo_error(patient.id, command.patient_photo)
           end
 
           patient.id
@@ -47,10 +47,6 @@ module Core
         Arkham.logger.info(
           "Photo params is not valid: \npatient_id => #{patient_id}\n patient_photo => #{patient_photo}"
         )
-      end
-
-      def raise_patient_existent_error
-        raise Errors::Patient::PatientAlreadyExistsError, 'Patient with this CPF already exists!'
       end
     end
   end

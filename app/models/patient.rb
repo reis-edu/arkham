@@ -8,12 +8,12 @@ class Patient < ApplicationRecord
   validates :lastname,     presence: true
   validates :cpf,          presence: true
   validates :gender,       presence: true
-  validates :status,       presence: true, inclusion: { in: %w( active inactive ) }
+  validates :status,       presence: true, inclusion: { in: %w[active inactive] }
 
   validates_uniqueness_of :cpf
 
   def active?
-    self.status == 'active'
+    status == 'active'
   end
 
   def age
