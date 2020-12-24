@@ -17,3 +17,4 @@ attributes :id,
            :photo_key
 
 node :age, &:age
+node(:fullname) { |patient| "#{patient.firstname} #{patient.lastname}".strip }

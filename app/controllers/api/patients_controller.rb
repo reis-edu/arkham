@@ -47,7 +47,7 @@ module Api
     private
 
     def list_patients
-      Api::Patient::FinderService.find_patients(patient_find_params)
+      Patients::FinderService.find_patients(patient_find_params)
     end
 
     def patient_find_params
