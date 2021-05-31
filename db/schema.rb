@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_05_142928) do
+ActiveRecord::Schema.define(version: 2021_06_03_185920) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -49,6 +49,21 @@ ActiveRecord::Schema.define(version: 2020_09_05_142928) do
     t.string "photo_key"
     t.string "gender"
     t.string "status", default: "active"
+  end
+
+  create_table "vital_signs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "patient_id", null: false
+    t.string "pa"
+    t.string "period"
+    t.integer "bpm"
+    t.integer "saturation"
+    t.string "blood_glucose"
+    t.float "temperature"
+    t.date "date"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "diuresis"
+    t.string "feces"
   end
 
 end
