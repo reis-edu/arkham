@@ -28,7 +28,7 @@ RSpec.describe Api::PatientsController, type: :controller do
         it 'is success!' do
           subject
           expect(response.status).to eq(200)
-          expect(JSON.parse(response.body)['id']).should_not be_nil
+          expect(JSON.parse(response.body)['id']).not_to be_nil
           expect(Patient.find(JSON.parse(response.body)['id']).active?).to be true
         end
       end
@@ -71,7 +71,7 @@ RSpec.describe Api::PatientsController, type: :controller do
           subject
 
           expect(response.status).to eq(200)
-          expect(JSON.parse(response.body)['id']).should_not be_nil
+          expect(JSON.parse(response.body)['id']).not_to be_nil
           expect(Patient.find(JSON.parse(response.body)['id']).photo_url).to eq nil
         end
       end
@@ -85,7 +85,7 @@ RSpec.describe Api::PatientsController, type: :controller do
         it 'creates patient without photo' do
           subject
           expect(response.status).to eq(200)
-          expect(JSON.parse(response.body)['id']).should_not be_nil
+          expect(JSON.parse(response.body)['id']).not_to be_nil
           expect(Patient.find(JSON.parse(response.body)['id']).photo_url).to eq nil
         end
       end

@@ -17,10 +17,10 @@ module Core
       private
 
       def define_vital_sign!(params)
-        vital_sign_schema = Api::VitalSignSchema.call(params)
+        vital_sign_schema = Api::VitalSignSchema.new.call(params)
         raise Api::Errors::SchemaValidationError, vital_sign_schema.errors if vital_sign_schema.errors.any?
 
-        @vital_sign = vital_sign_schema.output
+        @vital_sign = vital_sign_schema.to_h
       end
 
       def define_patient!(patient_id)
