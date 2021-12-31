@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 module Collaborators
   class ScaleOfWorkService
-    
     def create(month, year = Time.current.year)
-      reference_date = Time.new(year, month, 1)
+      Time.new(year, month, 1)
     end
 
     def find(month, year = Time.current.year)

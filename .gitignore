@@ -33,3 +33,4 @@ dump.rdb
 docker-compose.override.yml
 
 .tags
+node_modules

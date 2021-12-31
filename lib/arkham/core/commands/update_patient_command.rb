@@ -18,8 +18,8 @@ module Core
       def define_patient_photo(photo_params)
         return {} if photo_params.nil? || photo_params.empty?
 
-        patient_photo_validation = Api::PatientPhotoSchema.call(photo_params)
-        return patient_photo_validation.output unless patient_photo_validation.errors.any?
+        patient_photo_validation = Api::PatientPhotoSchema.new.call(photo_params)
+        return patient_photo_validation.to_h unless patient_photo_validation.errors.any?
 
         raise Api::Errors::SchemaValidationError, patient_photo_validation.errors
       end

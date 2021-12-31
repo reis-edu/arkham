@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.6.3'
+ruby '3.0.3'
 
 gem 'bootsnap', '>= 1.4.2', require: false
 gem 'dry-validation'
@@ -12,8 +12,8 @@ gem 'jbuilder',               '~> 2.7'
 gem 'pg',                     '>= 0.18', '< 2.0'
 gem 'puma',                   '~> 4.1'
 gem 'rabl-rails'
-gem 'rack-cors',              :require => 'rack/cors'
-gem 'rails',                  '~> 6.0.2', '>= 6.0.2.2'
+gem 'rack-cors',              require: 'rack/cors'
+gem 'rails',                  '~> 7.0'
 gem 'sass-rails',             '>= 6'
 gem 'settingslogic'
 gem 'turbolinks', '~> 5'

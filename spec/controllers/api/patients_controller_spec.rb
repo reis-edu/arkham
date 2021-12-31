@@ -28,7 +28,7 @@ RSpec.describe Api::PatientsController, type: :controller do
         it 'is success!' do
           subject
           expect(response.status).to eq(200)
-          expect(JSON.parse(response.body)['id']).should_not be_nil
+          expect(JSON.parse(response.body)['id']).not_to be_nil
           expect(Patient.find(JSON.parse(response.body)['id']).active?).to be true
         end
       end
@@ -71,7 +71,7 @@ RSpec.describe Api::PatientsController, type: :controller do
           subject
 
           expect(response.status).to eq(200)
-          expect(JSON.parse(response.body)['id']).should_not be_nil
+          expect(JSON.parse(response.body)['id']).not_to be_nil
           expect(Patient.find(JSON.parse(response.body)['id']).photo_url).to eq nil
         end
       end
@@ -85,7 +85,7 @@ RSpec.describe Api::PatientsController, type: :controller do
         it 'creates patient without photo' do
           subject
           expect(response.status).to eq(200)
-          expect(JSON.parse(response.body)['id']).should_not be_nil
+          expect(JSON.parse(response.body)['id']).not_to be_nil
           expect(Patient.find(JSON.parse(response.body)['id']).photo_url).to eq nil
         end
       end
@@ -116,7 +116,7 @@ RSpec.describe Api::PatientsController, type: :controller do
         lastname: 'Cedore2',
         diagnosis: 'Trombose',
         photo: {
-          photo_base64: base64_image,
+          photo_base64: base64_image.encode,
           photo_base64_format: 'png'
         }
       }
@@ -125,8 +125,8 @@ RSpec.describe Api::PatientsController, type: :controller do
         patient = create(:patient)
         storage_file_instance = double(Google::Cloud::Storage::File, id: '123abc', public_url: '')
         allow_any_instance_of(Google::Cloud::Storage::Bucket)
-          .to receive(:create_file).and_return(storage_file_instance)
-
+        .to receive(:create_file).and_return(storage_file_instance)
+        
         put :update, params: { id: patient.id, patient: payload }
 
         expect(response.status).to eq(200)
