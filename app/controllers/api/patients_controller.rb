@@ -26,6 +26,14 @@ module Api
       head(:not_found)
     end
 
+    def destroy
+      command = Core::Commands::DestroyPatientCommand.new(params[:id])
+      Core::CommandHandlers::DestroyPatientCommandHandler.new.execute(command)
+      head(:ok)
+    rescue ActiveRecord::RecordNotFound
+      head(:not_found)
+    end
+
     def activate
       patient = @patient_repository.find_by_id(params[:id])
       return head(:not_found) unless patient
