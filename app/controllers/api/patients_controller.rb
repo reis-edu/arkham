@@ -11,15 +11,13 @@ module Api
     end
 
     def create
-      command = Core::Commands::CreatePatientCommand.new(patient_params: permitted_params.to_h)
-      patient_id = Core::CommandHandlers::CreatePatientCommandHandler.new.execute(command)
+      patient_id = Core::Services::CreatePatient.new(permitted_params.to_h).create
 
       render json: { id: patient_id }
     end
 
     def update
-      command = Core::Commands::UpdatePatientCommand.new(id: params[:id], patient_params: permitted_params.to_h)
-      patient_id = Core::CommandHandlers::UpdatePatientCommandHandler.new.execute(command)
+      patient_id = Core::Services::UpdatePatient.new(params[:id], permitted_params.to_h).update
 
       render json: { id: patient_id }
     rescue ActiveRecord::RecordNotFound
@@ -27,8 +25,7 @@ module Api
     end
 
     def destroy
-      command = Core::Commands::DestroyPatientCommand.new(params[:id])
-      Core::CommandHandlers::DestroyPatientCommandHandler.new.execute(command)
+      Core::Services::DestroyPatient.new(params[:id]).destroy
       head(:ok)
     rescue ActiveRecord::RecordNotFound
       head(:not_found)

@@ -95,8 +95,11 @@ RSpec.describe Api::PatientsController, type: :controller do
   describe 'PUT #update' do
     context 'when everything goes well', :vcr do
       payload = {
+        firstname: 'Pedra',
         lastname: 'Cedore2',
         diagnosis: 'Trombose',
+        cpf: '123.456.789-10',
+        gender: 'female',
         photo: {}
       }
 
@@ -113,8 +116,11 @@ RSpec.describe Api::PatientsController, type: :controller do
     context 'and photo is updated' do
       base64_image = File.open('spec/images/arkham.jpg', 'rb', &:read)
       payload = {
+        firstname: 'Pedra',
         lastname: 'Cedore2',
         diagnosis: 'Trombose',
+        cpf: '123.456.789-10',
+        gender: 'female',
         photo: {
           photo_base64: base64_image.encode,
           photo_base64_format: 'png'
@@ -137,8 +143,11 @@ RSpec.describe Api::PatientsController, type: :controller do
 
     context 'when patient is not found' do
       payload = {
+        firstname: 'Pedra',
         lastname: 'Cedore2',
-        diagnosis: 'Trombose'
+        diagnosis: 'Trombose',
+        cpf: '123.456.789-10',
+        gender: 'female'
       }
 
       it 'renders 404' do
