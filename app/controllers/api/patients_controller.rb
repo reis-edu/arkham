@@ -3,7 +3,9 @@
 module Api
   class PatientsController < ApplicationController
     def initialize(repositories = {})
-      @patient_repository = repositories.fetch(:patient) { Infra::Repositories::PatientRepository.new }
+      @patient_repository = repositories.fetch(:patient) do
+        Infra::Repositories::PatientRepository.new
+      end
     end
 
     def index
@@ -11,13 +13,13 @@ module Api
     end
 
     def create
-      patient_id = Core::Services::CreatePatient.new(permitted_params.to_h).create
+      patient_id = Services::Patients::Create.new(permitted_params.to_h).create
 
       render json: { id: patient_id }
     end
 
     def update
-      patient_id = Core::Services::UpdatePatient.new(params[:id], permitted_params.to_h).update
+      patient_id = Services::Patients::Update.new(params[:id], permitted_params.to_h).update
 
       render json: { id: patient_id }
     rescue ActiveRecord::RecordNotFound
@@ -25,7 +27,7 @@ module Api
     end
 
     def destroy
-      Core::Services::DestroyPatient.new(params[:id]).destroy
+      Services::Patients::Destroy.new(params[:id]).destroy
       head(:ok)
     rescue ActiveRecord::RecordNotFound
       head(:not_found)
@@ -52,7 +54,7 @@ module Api
     private
 
     def list_patients
-      Patients::FinderService.find_patients(patient_find_params)
+      Services::Patients::Finder.find_patients(patient_find_params)
     end
 
     def patient_find_params

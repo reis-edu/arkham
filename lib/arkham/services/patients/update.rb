@@ -1,7 +1,8 @@
-module Core
-  module Services
-    class UpdatePatient < Factories::Patient
+# frozen_string_literal: true
 
+module Services
+  module Patients
+    class Update < Factories::Patient
       def initialize(id, attrs, repositories = {})
         super(attrs, repositories)
         @id = id
@@ -14,7 +15,7 @@ module Core
         ActiveRecord::Base.transaction do
           patient_repository.update(patient, result.except(:photo))
           patient_photo = PatientPhoto.new(patient.id, result.dig(:photo, :photo_base64),
-                                            result.dig(:photo, :photo_base64_format))
+                                           result.dig(:photo, :photo_base64_format))
           if patient_photo_repository.valid?(patient_photo)
             save_patient_photo(patient_photo, patient)
           else

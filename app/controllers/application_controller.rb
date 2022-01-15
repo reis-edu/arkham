@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
     render_unprocessable_entity(validation_error.errors)
   end
 
-  rescue_from Core::Errors::Patient::PatientAlreadyExistsError do |error|
+  rescue_from Errors::Patient::PatientAlreadyExistsError do |error|
     render_unprocessable_entity(error.message)
   end
 

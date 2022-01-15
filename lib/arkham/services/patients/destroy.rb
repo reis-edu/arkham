@@ -1,6 +1,8 @@
-module Core
-  module Services
-    class DestroyPatient
+# frozen_string_literal: true
+
+module Services
+  module Patients
+    class Destroy
       def initialize(id, repositories = {})
         @id = id
         @patient_repository = repositories.fetch(:patient) do

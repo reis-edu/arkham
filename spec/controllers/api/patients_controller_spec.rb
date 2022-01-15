@@ -131,8 +131,8 @@ RSpec.describe Api::PatientsController, type: :controller do
         patient = create(:patient)
         storage_file_instance = double(Google::Cloud::Storage::File, id: '123abc', public_url: '')
         allow_any_instance_of(Google::Cloud::Storage::Bucket)
-        .to receive(:create_file).and_return(storage_file_instance)
-        
+          .to receive(:create_file).and_return(storage_file_instance)
+
         put :update, params: { id: patient.id, patient: payload }
 
         expect(response.status).to eq(200)
