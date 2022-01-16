@@ -5,16 +5,18 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '3.0.3'
 
+gem 'bcrypt'
 gem 'bootsnap', '>= 1.4.2', require: false
 gem 'dry-validation'
 gem 'google-cloud-storage'
-gem 'jbuilder',               '~> 2.7'
-gem 'pg',                     '>= 0.18', '< 2.0'
-gem 'puma',                   '~> 4.1'
+gem 'jbuilder', '~> 2.7'
+gem 'jwt'
+gem 'pg', '>= 0.18', '< 2.0'
+gem 'puma', '~> 4.1'
 gem 'rabl-rails'
-gem 'rack-cors',              require: 'rack/cors'
-gem 'rails',                  '~> 7.0'
-gem 'sass-rails',             '>= 6'
+gem 'rack-cors', require: 'rack/cors'
+gem 'rails', '~> 7.0'
+gem 'sass-rails', '>= 6'
 gem 'settingslogic'
 gem 'turbolinks', '~> 5'
 gem 'vcr'
@@ -32,14 +34,13 @@ end
 group :development do
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'rubocop'
-  gem 'spring'
-  gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'web-console', '>= 3.3.0'
 end
 
 group :test do
   gem 'capybara', '>= 2.15'
   gem 'selenium-webdriver'
+  gem 'timecop'
   gem 'webdrivers'
 end
 
