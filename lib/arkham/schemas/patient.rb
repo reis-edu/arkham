@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Api
-  class PatientSchema < Dry::Validation::Contract
+module Schemas
+  class Patient < Dry::Validation::Contract
     params do
       required(:firstname).filled(:str?)
       required(:lastname).filled(:str?)
@@ -14,6 +14,13 @@ module Api
       optional(:birth_date).filled(:date)
       optional(:created_at).filled(:date_time?)
       optional(:updated_at).filled(:date_time?)
+
+      optional(:photo).hash do
+        optional(:photo_base64).filled(:str?)
+        optional(:photo_base64_format).filled(:str?)
+        optional(:photo_url).filled(:str?)
+        optional(:photo_key).filled(:str?)
+      end
     end
   end
 end

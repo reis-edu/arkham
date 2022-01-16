@@ -95,8 +95,11 @@ RSpec.describe Api::PatientsController, type: :controller do
   describe 'PUT #update' do
     context 'when everything goes well', :vcr do
       payload = {
+        firstname: 'Pedra',
         lastname: 'Cedore2',
         diagnosis: 'Trombose',
+        cpf: '123.456.789-10',
+        gender: 'female',
         photo: {}
       }
 
@@ -113,8 +116,11 @@ RSpec.describe Api::PatientsController, type: :controller do
     context 'and photo is updated' do
       base64_image = File.open('spec/images/arkham.jpg', 'rb', &:read)
       payload = {
+        firstname: 'Pedra',
         lastname: 'Cedore2',
         diagnosis: 'Trombose',
+        cpf: '123.456.789-10',
+        gender: 'female',
         photo: {
           photo_base64: base64_image.encode,
           photo_base64_format: 'png'
@@ -125,8 +131,8 @@ RSpec.describe Api::PatientsController, type: :controller do
         patient = create(:patient)
         storage_file_instance = double(Google::Cloud::Storage::File, id: '123abc', public_url: '')
         allow_any_instance_of(Google::Cloud::Storage::Bucket)
-        .to receive(:create_file).and_return(storage_file_instance)
-        
+          .to receive(:create_file).and_return(storage_file_instance)
+
         put :update, params: { id: patient.id, patient: payload }
 
         expect(response.status).to eq(200)
@@ -137,8 +143,11 @@ RSpec.describe Api::PatientsController, type: :controller do
 
     context 'when patient is not found' do
       payload = {
+        firstname: 'Pedra',
         lastname: 'Cedore2',
-        diagnosis: 'Trombose'
+        diagnosis: 'Trombose',
+        cpf: '123.456.789-10',
+        gender: 'female'
       }
 
       it 'renders 404' do
@@ -149,11 +158,31 @@ RSpec.describe Api::PatientsController, type: :controller do
     end
   end
 
-  describe 'POST #activate' do
+  describe 'DELETE #destroy' do
+    context 'when everything goes well', :vcr do
+      it 'deletes patient' do
+        patient = create(:patient)
+        delete :destroy, params: { id: patient.id }
+
+        expect(response.status).to eq(200)
+        expect(Patient.count).to eq 0
+      end
+    end
+
+    context 'when patient is not found' do
+      it 'renders 404' do
+        delete :destroy, params: { id: '123' }
+
+        expect(response.status).to eq(404)
+      end
+    end
+  end
+
+  describe 'PUT #activate' do
     context 'when everything goes well' do
       it 'updates patient status to active' do
         patient = create(:patient, status: 'inactive')
-        post :activate, params: { id: patient.id }
+        put :activate, params: { id: patient.id }
 
         expect(response.status).to eq(200)
         expect(Patient.find(JSON.parse(response.body)['id']).active?).to be true
@@ -162,18 +191,18 @@ RSpec.describe Api::PatientsController, type: :controller do
 
     context 'when patient is not found' do
       it 'renders 404' do
-        post :activate, params: { id: '123' }
+        put :activate, params: { id: '123' }
 
         expect(response.status).to eq(404)
       end
     end
   end
 
-  describe 'POST #inactivate' do
+  describe 'PUT #inactivate' do
     context 'when everything goes well' do
       it 'updates patient status to inactive' do
         patient = create(:patient)
-        post :inactivate, params: { id: patient.id }
+        put :inactivate, params: { id: patient.id }
 
         expect(response.status).to eq(200)
         expect(Patient.find(JSON.parse(response.body)['id']).active?).to be false
@@ -182,7 +211,7 @@ RSpec.describe Api::PatientsController, type: :controller do
 
     context 'when patient is not found' do
       it 'renders 404' do
-        post :inactivate, params: { id: '123' }
+        put :inactivate, params: { id: '123' }
 
         expect(response.status).to eq(404)
       end
