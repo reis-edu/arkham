@@ -10,7 +10,7 @@ module Services
         end
       end
 
-      def destroy
+      def execute
         patient = @patient_repository.find_by_id(@id)
         raise ActiveRecord::RecordNotFound unless patient
 

@@ -13,13 +13,13 @@ module Api
     end
 
     def create
-      patient_id = Services::Patients::Create.new(permitted_params.to_h).create
+      patient_id = Services::Patients::Create.new(permitted_params.to_h).execute
 
       render json: { id: patient_id }
     end
 
     def update
-      patient_id = Services::Patients::Update.new(params[:id], permitted_params.to_h).update
+      patient_id = Services::Patients::Update.new(params[:id], permitted_params.to_h).execute
 
       render json: { id: patient_id }
     rescue ActiveRecord::RecordNotFound
@@ -27,7 +27,8 @@ module Api
     end
 
     def destroy
-      Services::Patients::Destroy.new(params[:id]).destroy
+      Services::Patients::Destroy.new(params[:id]).execute
+
       head(:ok)
     rescue ActiveRecord::RecordNotFound
       head(:not_found)

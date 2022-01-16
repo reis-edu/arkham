@@ -8,7 +8,7 @@ module Services
         @id = id
       end
 
-      def update
+      def execute
         patient = patient_repository.find_by_id(@id)
         raise ActiveRecord::RecordNotFound unless patient
 

@@ -7,7 +7,7 @@ module Services
         super
       end
 
-      def create
+      def execute
         new_patient = Patient.new(result.except(:photo))
         raise_patient_existent_error if Patient.exists?(cpf: new_patient.cpf)
 
