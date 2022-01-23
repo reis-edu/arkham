@@ -96,7 +96,7 @@ RSpec.describe Visitors::VisitsController, type: :controller do
     end
   end
 
-  describe 'GET #visits_patients' do
+  describe 'GET #patients' do
     context 'Success' do
       before do
         patient = create(:patient)
@@ -255,6 +255,60 @@ RSpec.describe Visitors::VisitsController, type: :controller do
         it 'returns conflict message error' do
           subject
           expect(response.status).to eq(409)
+        end
+      end
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    let(:patient) { create(:patient) }
+    let(:visitor) { create(:visitor) }
+    let(:visit) { create(:visit, patient_id: patient.id, visitor_id: visitor.id) }
+
+    context 'Success' do
+      context 'When visitor can delete a visit' do
+        before do
+          allow(JsonWebToken).to receive(:decode)
+            .and_return({ visitor_id: visitor.id })
+        end
+
+        subject do
+          delete :destroy, params: { id: visit.id }, format: :json
+        end
+
+        it 'returns 200 status' do
+          subject
+          expect(response.status).to eq 200
+          expect(Visit.count).to eq 0
+        end
+      end
+    end
+
+    context 'Error' do
+      context 'When request is unauthorized' do
+        subject do
+          delete :destroy, params: { id: visit.id }
+        end
+
+        it 'returns unauthorized message error' do
+          subject
+          expect(response.status).to eq(401)
+        end
+      end
+
+      context 'When visit is not found' do
+        before do
+          allow(JsonWebToken).to receive(:decode)
+            .and_return({ visitor_id: visitor.id })
+        end
+
+        subject do
+          delete :destroy, params: { id: '123' }
+        end
+
+        it 'returns unauthorized message error' do
+          subject
+          expect(response.status).to eq(404)
         end
       end
     end

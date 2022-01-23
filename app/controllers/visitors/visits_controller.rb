@@ -39,6 +39,14 @@ module Visitors
       @patients = list_patients
     end
 
+    def destroy
+      Services::Visits::Destroy.new(params[:id]).execute
+
+      head(:ok)
+    rescue ActiveRecord::RecordNotFound
+      head(:not_found)
+    end
+
     private
 
     def permitted_params
