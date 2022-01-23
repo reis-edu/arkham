@@ -35,6 +35,10 @@ module Visitors
       render json: { errors: 'There is already a visit at this time' }, status: :conflict
     end
 
+    def patients
+      @patients = list_patients
+    end
+
     private
 
     def permitted_params
@@ -49,6 +53,10 @@ module Visitors
 
     def list_visits
       Services::Visits::Finder.find_visits({ visitor_id: @current_visitor.id })
+    end
+
+    def list_patients
+      Services::Patients::Finder.resumed_list
     end
   end
 end

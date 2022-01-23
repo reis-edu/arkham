@@ -96,6 +96,42 @@ RSpec.describe Visitors::VisitsController, type: :controller do
     end
   end
 
+  describe 'GET #visits_patients' do
+    context 'Success' do
+      before do
+        patient = create(:patient)
+        visitor = create(:visitor)
+        create(:visit, patient_id: patient.id, visitor_id: visitor.id)
+        allow(JsonWebToken).to receive(:decode)
+          .and_return({ visitor_id: visitor.id })
+      end
+
+      subject do
+        get :patients, format: :json
+      end
+
+      render_views
+      it 'returns patients' do
+        subject
+        expect(response.status).to eq(200)
+        expect(JSON.parse(response.body)['patients'].count).to be 1
+      end
+    end
+
+    context 'Error' do
+      context 'When request is unauthorized' do
+        subject do
+          get :patients
+        end
+
+        it 'returns unauthorized message error' do
+          subject
+          expect(response.status).to eq(401)
+        end
+      end
+    end
+  end
+
   describe 'POST #create' do
     visit_json = JSON.parse(File.read('spec/fixtures/visit/visit.json'))
 

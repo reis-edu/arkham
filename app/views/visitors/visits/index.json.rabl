@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 collection :@visits
 attributes :id,
            :patient_id,

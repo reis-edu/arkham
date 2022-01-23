@@ -2,9 +2,11 @@
 
 Rails.application.routes.draw do
   namespace :visitors, defaults: { format: 'json' } do
-    post '/login',    to: 'authentication#login'
-    post '/new',      to: 'visitors#create'
+    post '/login',                to: 'authentication#login'
+    post '/new',                  to: 'visitors#create'
+    
     resources :visits
+    get '/visits/patients',      to: 'visits#patients'
   end
 
   namespace :api, defaults: { format: 'json' } do
