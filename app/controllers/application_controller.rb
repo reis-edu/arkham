@@ -9,6 +9,19 @@ class ApplicationController < ActionController::Base
     render_unprocessable_entity(error.message)
   end
 
+  def authorize_visitor_request
+    header = request.headers['Authorization']
+    header = header.split(' ').last if header
+    begin
+      @decoded = JsonWebToken.decode(header)
+      @current_visitor = Visitor.find(@decoded[:visitor_id])
+    rescue ActiveRecord::RecordNotFound => e
+      render json: { errors: e.message }, status: :unauthorized
+    rescue JWT::DecodeError => e
+      render json: { errors: e.message }, status: :unauthorized
+    end
+  end
+
   private
 
   def render_unprocessable_entity(error_message)

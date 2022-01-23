@@ -7,6 +7,9 @@ defaults: &defaults
     profile_image_format: 'png'
     acl: 'public_read'
 
+  visits:
+    duration: 20
+
 development:
   <<: *defaults
 
