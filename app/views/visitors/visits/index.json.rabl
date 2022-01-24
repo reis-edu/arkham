@@ -1,9 +1,13 @@
 collection :@visits
 attributes :id,
-           :patient_id,
            :visitor_id,
            :start_date,
            :end_date,
            :description,
            :created_at,
            :updated_at
+
+child(:patient) { attributes  :firstname,
+                              :lastname,
+                              :gender,
+                              :photo_url }
