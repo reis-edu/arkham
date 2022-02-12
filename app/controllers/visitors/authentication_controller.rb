@@ -9,8 +9,13 @@ module Visitors
       if @visitor&.authenticate(params[:password])
         token = JsonWebToken.encode(visitor_id: @visitor.id)
         time = Time.now + 24.hours.to_i
-        render json: { token: token, exp: time.strftime('%m-%d-%Y %H:%M'),
-                       username: @visitor.username }, status: :ok
+        render json: { token:       token,
+                       exp:         time.strftime('%m-%d-%Y %H:%M'),
+                       firstname:   @visitor.firstname,
+                       lastname:    @visitor.lastname,
+                       fullname:    "#{@visitor.firstname} #{@visitor.lastname}",
+                       email:       @visitor.email
+                     }, status: :ok
       else
         render json: { error: 'unauthorized' }, status: :unauthorized
       end

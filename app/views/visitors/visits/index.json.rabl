@@ -11,3 +11,5 @@ child(:patient) { attributes  :firstname,
                               :lastname,
                               :gender,
                               :photo_url }
+child(:visitor) { attributes  :fullname,
+                              :email }

@@ -16,7 +16,7 @@ module Visitors
 
     def visitor_creator_params
       params.permit(
-        :name, :username, :email, :password, :password_confirmation
+        :firstname, :lastname, :email, :password, :password_confirmation
       )
     end
   end
