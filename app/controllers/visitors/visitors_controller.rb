@@ -7,7 +7,7 @@ module Visitors
       if @visitor.save
         render json: @visitor, status: :created
       else
-        render json: { errors: @visitor.errors.full_messages },
+        render json: { error: @visitor.errors.full_messages.first },
                status: :unprocessable_entity
       end
     end

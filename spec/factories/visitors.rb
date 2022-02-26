@@ -2,8 +2,8 @@
 
 FactoryBot.define do
   factory :visitor do
-    name { 'MyString' }
-    username { 'MyString' }
+    firstname { 'MyString' }
+    lastname { 'MyString' }
     email { 'MyString@google.com' }
     password { 'MyString@123' }
   end

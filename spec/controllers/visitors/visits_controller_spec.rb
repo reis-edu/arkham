@@ -35,7 +35,7 @@ RSpec.describe Visitors::VisitsController, type: :controller do
 
         it 'returns unauthorized message error' do
           subject
-          expect(response.status).to eq(401)
+          expect(response.status).to eq(403)
         end
       end
     end
@@ -74,7 +74,7 @@ RSpec.describe Visitors::VisitsController, type: :controller do
 
         it 'returns unauthorized message error' do
           subject
-          expect(response.status).to eq(401)
+          expect(response.status).to eq(403)
         end
       end
 
@@ -126,7 +126,7 @@ RSpec.describe Visitors::VisitsController, type: :controller do
 
         it 'returns unauthorized message error' do
           subject
-          expect(response.status).to eq(401)
+          expect(response.status).to eq(403)
         end
       end
     end
@@ -162,7 +162,7 @@ RSpec.describe Visitors::VisitsController, type: :controller do
 
         it 'returns unauthorized message error' do
           subject
-          expect(response.status).to eq(401)
+          expect(response.status).to eq(403)
         end
       end
 
@@ -227,7 +227,7 @@ RSpec.describe Visitors::VisitsController, type: :controller do
 
         it 'returns unauthorized message error' do
           subject
-          expect(response.status).to eq(401)
+          expect(response.status).to eq(403)
         end
       end
 
@@ -292,7 +292,7 @@ RSpec.describe Visitors::VisitsController, type: :controller do
 
         it 'returns unauthorized message error' do
           subject
-          expect(response.status).to eq(401)
+          expect(response.status).to eq(403)
         end
       end
 
