@@ -7,7 +7,7 @@ module Schemas
       required(:patient_id).filled(:str?)
       required(:start_date).filled(:date_time?)
       required(:end_date).filled(:date_time?)
-      optional(:description).filled(:str?)
+      optional(:description)
     end
   end
 end

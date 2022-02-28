@@ -10,7 +10,6 @@ module Infra
       end
 
       def create(visit)
-        validate_schedule!(visit)
         visit.save
       end
 

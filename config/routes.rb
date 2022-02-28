@@ -6,7 +6,7 @@ Rails.application.routes.draw do
     post '/new',                  to: 'visitors#create'
     
     resources :visits
-    get '/visits/patients',      to: 'visits#patients'
+    get '/patients',              to: 'visits#patients'
   end
 
   namespace :api, defaults: { format: 'json' } do
