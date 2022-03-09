@@ -4,7 +4,7 @@ module Services
   module Visits
     class Finder
       def self.find_visits(params)
-        ::Visit.where(params).all
+        ::Visit.where(params).all.order(start_date: :desc)
       end
 
       def self.find(id)
