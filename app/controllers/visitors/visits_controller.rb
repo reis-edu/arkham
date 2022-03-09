@@ -11,7 +11,7 @@ module Visitors
     def show
       @visit = find_visit
     rescue ActiveRecord::RecordNotFound
-      render json: { errors: 'visit not found' }, status: :not_found
+      render json: { error: 'visit not found' }, status: :not_found
     end
 
     def create
@@ -21,7 +21,7 @@ module Visitors
 
       render json: { id: visit_id }
     rescue Errors::Visit::ConflictingVisitError
-      render json: { errors: 'There is already a visit at this time' }, status: :conflict
+      render json: { error: 'There is already a visit at this time' }, status: :conflict
     end
 
     def update
@@ -32,7 +32,7 @@ module Visitors
 
       render json: { id: visit_id }
     rescue Errors::Visit::ConflictingVisitError
-      render json: { errors: 'There is already a visit at this time' }, status: :conflict
+      render json: { error: 'There is already a visit at this time' }, status: :conflict
     end
 
     def patients
