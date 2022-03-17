@@ -83,4 +83,4 @@ production:
   <<: *default
   database: arkham_production
   username: arkham
-  password: <%= ENV['ARKHAN_DATABASE_PASSWORD'] %>
+  password: arkham
