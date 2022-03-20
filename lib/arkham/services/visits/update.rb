@@ -7,7 +7,9 @@ module Services
 
       def initialize(id, attrs, repositories = {})
         super(attrs, repositories)
+
         @id = id
+        @attrs = attrs
       end
 
       def execute
@@ -15,10 +17,17 @@ module Services
         raise ActiveRecord::RecordNotFound unless visit
 
         ActiveRecord::Base.transaction do
-          visit_repository.update(visit, result)
+          visit_repository.update(visit, @attrs)
 
           visit.id
         end
+      end
+
+      def find_visit
+        visit = visit_repository.find_by_id(@id)
+        raise ActiveRecord::RecordNotFound unless visit
+
+        visit
       end
     end
   end

@@ -51,7 +51,7 @@ module Visitors
 
     def permitted_params
       params.require(:visit).permit(
-        :visitor_id, :patient_id, :start_date, :end_date, :description
+        :visitor_id, :patient_id, :canceled, :start_date, :end_date, :description
       )
     end
 
