@@ -1,6 +1,7 @@
 collection :@visits
 attributes :id,
            :visitor_id,
+           :canceled,
            :description,
            :created_at,
            :updated_at
