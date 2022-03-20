@@ -3,6 +3,7 @@
 object :@visit
 attributes :id,
            :patient_id,
+           :canceled,
            :visitor_id,
            :start_date,
            :end_date,
