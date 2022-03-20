@@ -83,6 +83,6 @@ test:
 #
 production:
   <<: *default
-  database: ENV['ARKHAM_DATABASE_NAME']
-  username: ENV['ARKHAM_DATABASE_USERNAME']
-  password: ENV['ARKHAM_DATABASE_PASSWORD']
+  database: <%= ENV['ARKHAM_DATABASE_NAME'] %>
+  username: <%= ENV['ARKHAM_DATABASE_USERNAME'] %>
+  password: <%= ENV['ARKHAM_DATABASE_PASSWORD'] %>
