@@ -17,7 +17,7 @@ class PatientPhoto
   end
 
   def save
-    firebase_image = @bucket.create_file(StringIO.new(base64_image), file_path, acl: file_acl)
+    firebase_image = @bucket.create_file(StringIO.new(serialized_image), file_path, acl: file_acl)
     @photo_key = firebase_image.id
     @photo_url = firebase_image.public_url
   end
@@ -30,5 +30,9 @@ class PatientPhoto
 
   def file_acl
     Arkham.config.firebase['acl']
+  end
+
+  def serialized_image
+    Base64.decode64(base64_image.split(',', 2).last)
   end
 end

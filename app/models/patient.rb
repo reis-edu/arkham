@@ -18,6 +18,8 @@ class Patient < ApplicationRecord
 
   def age
     Date.today.year - birth_date.year
+  rescue
+    0
   end
 
   def fullname
