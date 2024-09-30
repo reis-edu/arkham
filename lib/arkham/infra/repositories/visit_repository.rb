@@ -11,6 +11,7 @@ module Infra
 
       def create(visit)
         visit.save
+        validate_schedule!(visit.reload)
       end
 
       def update(visit, attributes)
