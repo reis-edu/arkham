@@ -25,7 +25,7 @@ class PatientPhoto
   private
 
   def file_path
-    "#{Arkham.config.firebase['profile_path']}/#{patient_id}.#{base64_image_format}"
+    "#{Arkham.config.firebase['patient_path']}/profile-photo-#{patient_id}.#{base64_image_format}"
   end
 
   def file_acl
