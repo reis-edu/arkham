@@ -30,12 +30,12 @@ module Factories
 
     def format_start_date(string_date)
       date = string_date.to_datetime
-      Time.new(date.year, date.month, date.day, date.hour, date.min)
+      Time.zone.local(date.year, date.month, date.day, date.hour, date.min)
     end
 
     def format_end_date(string_date)
       date = string_date.to_datetime
-      Time.new(date.year, date.month, date.day, date.hour, date.min) + VISIT_DURATION.minutes
+      Time.zone.local(date.year, date.month, date.day, date.hour, date.min) + VISIT_DURATION.minutes
     end
   end
 end
