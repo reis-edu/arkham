@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_20_143644) do
-
+ActiveRecord::Schema[7.0].define(version: 2022_03_20_143644) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -23,14 +22,14 @@ ActiveRecord::Schema.define(version: 2022_03_20_143644) do
     t.string "unit_quantity"
     t.string "via"
     t.text "description"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "medicaments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "fullname"
   end
 
@@ -41,8 +40,8 @@ ActiveRecord::Schema.define(version: 2022_03_20_143644) do
     t.string "cpf"
     t.date "admission_date"
     t.date "birth_date"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "photo_url"
     t.string "firstname"
     t.string "lastname"
@@ -54,8 +53,8 @@ ActiveRecord::Schema.define(version: 2022_03_20_143644) do
   create_table "visitors", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.text "lastname"
     t.text "firstname"
   end
@@ -63,11 +62,11 @@ ActiveRecord::Schema.define(version: 2022_03_20_143644) do
   create_table "visits", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "patient_id", null: false
     t.uuid "visitor_id", null: false
-    t.datetime "start_date", precision: 6, null: false
-    t.datetime "end_date", precision: 6, null: false
+    t.datetime "start_date", null: false
+    t.datetime "end_date", null: false
     t.text "description"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean "canceled", default: false
   end
 
@@ -80,8 +79,8 @@ ActiveRecord::Schema.define(version: 2022_03_20_143644) do
     t.string "blood_glucose"
     t.float "temperature"
     t.date "date"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "diuresis"
     t.string "feces"
   end
