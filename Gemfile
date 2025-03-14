@@ -1,47 +1,48 @@
-# frozen_string_literal: true
+source "https://rubygems.org"
 
-source 'https://rubygems.org'
-git_source(:github) { |repo| "https://github.com/#{repo}.git" }
-
-ruby '3.0.3'
+ruby '3.4.2'
 
 gem 'bcrypt'
-gem 'bootsnap', '>= 1.4.2', require: false
+gem "rails", "~> 8.0.2"
+gem "propshaft"
+gem "puma", ">= 5.0"
+gem "importmap-rails"
+gem "turbo-rails"
+gem "stimulus-rails"
+gem "jbuilder"
+gem "tzinfo-data", platforms: %i[ windows jruby ]
+gem "solid_cache"
+gem "solid_queue"
+gem "solid_cable"
+gem 'settingslogic'
+gem "bootsnap", require: false
+gem "kamal", require: false
+gem "thruster", require: false
 gem 'dry-validation'
 gem 'google-cloud-storage'
-gem 'jbuilder', '~> 2.7'
 gem 'jwt'
 gem 'pg', '>= 0.18', '< 2.0'
-gem 'puma', '~> 4.1'
 gem 'rabl-rails'
-gem 'rack-cors', require: 'rack/cors'
-gem 'rails', '~> 7.0'
-gem 'sass-rails', '>= 6'
-gem 'settingslogic'
-gem 'turbolinks', '~> 5'
 gem 'vcr'
 gem 'webmock'
-gem 'webpacker', '~> 4.0'
+gem 'rack-cors'
 
 group :development, :test do
-  gem 'byebug', platforms: %i[mri mingw x64_mingw]
+  gem "brakeman", require: false
+  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
   gem 'factory_bot_rails'
-  gem 'pry'
-  gem 'pry-nav'
-  gem 'rspec-rails', '~> 4.0'
+  gem 'rspec-rails', '~> 7.0.0'
+  gem "rubocop-rails-omakase", require: false
 end
 
 group :development do
-  gem 'listen', '>= 3.0.5', '< 3.2'
-  gem 'rubocop'
-  gem 'web-console', '>= 3.3.0'
+  gem "web-console"
 end
 
 group :test do
-  gem 'capybara', '>= 2.15'
-  gem 'selenium-webdriver'
   gem 'timecop'
-  gem 'webdrivers'
+  gem "capybara"
+  gem "selenium-webdriver"
 end
 
-gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
+gem "factory_bot", "~> 6.5"

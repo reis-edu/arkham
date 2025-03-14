@@ -2,14 +2,18 @@
 
 #### Environment
 
-- Ruby version: `3.0.3`
-- Rails version: `7.0.4`
+- Ruby version: `3.4.2`
+- Rails version: `8.0.2`
 - Docker version: `28.0.1`
 - Docker Compose version: `2.33.1`
 
 #### Run application server with docker
 
-`-> docker compose up`
+```
+-> docker compose run --rm web bundle install
+-> docker compose build
+-> docker compose up
+```
 
 #### Run console with docker
 
@@ -18,8 +22,3 @@
 #### Run tests with docker
 
 `-> docker compose run -e "RAILS_ENV=test" -it web rspec`
-
-#### Run database migrations
-
-`-> docker compose run web rails db:migrate`
-

@@ -17,8 +17,8 @@ services:
       bash -c "
       rm -f tmp/pids/server.pid &&
       until pg_isready -h db -p 5432 -U arkham; do sleep 1; done &&
-      bundle exec rails db:create db:migrate &&
-      bundle exec rails server -b 0.0.0.0 -p 3000"
+      bin/rails db:create db:migrate &&
+      bin/rails server -b 0.0.0.0 -p 3000"
     environment:
       RAILS_ENV: development
       ARKHAM_DATABASE_NAME: arkham_development

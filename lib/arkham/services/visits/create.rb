@@ -3,7 +3,7 @@
 module Services
   module Visits
     class Create < Factories::Visit
-      VISIT_DURATION = Arkham.config.visits['duration'].freeze
+      VISIT_DURATION = Arkham.config[:visits][:duration].freeze
 
       def initialize(attrs, repositories = {})
         super

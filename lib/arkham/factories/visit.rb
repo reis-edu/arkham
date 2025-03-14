@@ -2,7 +2,7 @@
 
 module Factories
   class Visit
-    VISIT_DURATION = Arkham.config.visits['duration'].freeze
+    VISIT_DURATION = Arkham.config[:visits][:duration].freeze
 
     def initialize(attrs, repositories = {})
       @attrs = attrs

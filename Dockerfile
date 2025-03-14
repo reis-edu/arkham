@@ -1,6 +1,6 @@
 # Dockerfile
 
-FROM ruby:3.0.3
+FROM ruby:3.4.2
 
 # Install dependencies
 RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
@@ -18,4 +18,4 @@ RUN bundle install
 COPY . .
 
 # Command to run the Rails server
-CMD ["bash", "-c", "rm -f tmp/pids/server.pid && bundle exec rails s -b '0.0.0.0'"]
+CMD ["bash", "-c", "rm -f tmp/pids/server.pid && bin/rails server -b '0.0.0.0'"]
