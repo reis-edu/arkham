@@ -32,7 +32,7 @@ module Api
       patient_id = @update_patient_use_case.execute(params[:id], patient_params)
 
       render json: Arkham::Infrastructure::Adapters::Api::PatientPresenter.updated(patient_id)
-    rescue ActiveRecord::RecordNotFound
+    rescue Arkham::Domain::Errors::PatientNotFoundError
       head(:not_found)
     rescue StandardError => e
       render json: { error: e.message }, status: :unprocessable_entity
@@ -42,21 +42,21 @@ module Api
       @destroy_patient_use_case.execute(params[:id])
 
       head(:ok)
-    rescue ActiveRecord::RecordNotFound
+    rescue Arkham::Domain::Errors::PatientNotFoundError
       head(:not_found)
     end
 
     def activate
       patient_id = @activate_patient_use_case.execute(params[:id])
       render json: Arkham::Infrastructure::Adapters::Api::PatientPresenter.activated(patient_id)
-    rescue ActiveRecord::RecordNotFound
+    rescue Arkham::Domain::Errors::PatientNotFoundError
       head(:not_found)
     end
 
     def inactivate
       patient_id = @inactivate_patient_use_case.execute(params[:id])
       render json: Arkham::Infrastructure::Adapters::Api::PatientPresenter.inactivated(patient_id)
-    rescue ActiveRecord::RecordNotFound
+    rescue Arkham::Domain::Errors::PatientNotFoundError
       head(:not_found)
     end
 

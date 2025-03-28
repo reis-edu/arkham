@@ -9,17 +9,17 @@ module Arkham
           required(:lastname).filled(:str?, min_size?: 2, max_size?: 100)
           required(:cpf).filled(:str?)
           required(:gender).filled(:str?)
-          optional(:status).filled(:str?)
-          optional(:diagnosis).filled(:str?, max_size?: 500)
-          optional(:sus).filled(:str?, size?: 15)
-          optional(:rg).filled(:str?, max_size?: 20)
-          optional(:admission_date).filled(:date)
-          optional(:birth_date).filled(:date)
+          optional(:status).maybe(:str?)
+          optional(:diagnosis).maybe(:str?, max_size?: 500)
+          optional(:sus).maybe(:str?, size?: 15)
+          optional(:rg).maybe(:str?, max_size?: 20)
+          optional(:admission_date).maybe(:date)
+          optional(:birth_date).maybe(:date)
           optional(:photo).hash do
-            optional(:photo_base64).filled(:str?)
-            optional(:photo_base64_format).filled(:str?)
-            optional(:photo_url).filled(:str?, format?: URI::regexp)
-            optional(:photo_key).filled(:str?)
+            optional(:photo_base64).maybe(:str?)
+            optional(:photo_base64_format).maybe(:str?)
+            optional(:photo_url).maybe(:str?, format?: URI::regexp)
+            optional(:photo_key).maybe(:str?)
           end
         end
 

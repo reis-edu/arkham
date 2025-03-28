@@ -30,12 +30,12 @@ module Arkham
         def validate_patient_params(params)
           api_validation = Infrastructure::Schemas::Api::PatientSchema.new.call(params)
           if api_validation.errors.any?
-            raise StandardError.new(api_validation.errors.to_h)
+            raise Infrastructure::Errors::ApiValidationError.new(api_validation.errors.to_h)
           end
 
           domain_validation = Domain::Schemas::PatientSchema.new.call(api_validation.to_h)
           if domain_validation.errors.any?
-            raise Domain::Errors::ValidationError, domain_validation.errors
+            raise Domain::Errors::ValidationError.new(domain_validation.errors.to_h)
           end
 
           domain_validation.to_h
@@ -43,7 +43,7 @@ module Arkham
         
         def check_patient_exists(cpf)
           if ::Patient.exists?(cpf: cpf)
-            raise Errors::Patient::PatientAlreadyExistsError, 'Patient with this CPF already exists!'
+            raise Domain::Errors::PatientAlreadyExistsError, 'Patient with this CPF already exists!'
           end
         end
 
@@ -72,7 +72,7 @@ module Arkham
             }
           )
         rescue StandardError => e
-          raise Errors::Patient::PatientPhotoError, "Error on save patient photo! Error: #{e}"
+          raise Domain::Errors::PatientPhotoError, "Error on save patient photo! Error: #{e}"
         end
 
         def log_photo_error(patient_id, patient_photo)

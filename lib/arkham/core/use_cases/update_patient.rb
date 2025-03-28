@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Core
     module UseCases
@@ -9,7 +11,6 @@ module Arkham
 
         def execute(patient_id, patient_params)
           validated_params = validate_patient_params(patient_params)
-
           patient = find_patient(patient_id)
 
           ActiveRecord::Base.transaction do
@@ -27,20 +28,24 @@ module Arkham
         private
 
         def validate_patient_params(params)
-          patient_validation = Schemas::Patient.new.call(params)
-
-          if patient_validation.errors.any?
-            raise Api::Errors::SchemaValidationError, patient_validation.errors
+          api_validation = Infrastructure::Schemas::Api::PatientSchema.new.call(params)
+          if api_validation.errors.any?
+            raise Infrastructure::Errors::ApiValidationError.new(api_validation.errors.to_h)
           end
 
-          patient_validation.to_h
+          domain_validation = Domain::Schemas::PatientSchema.new.call(api_validation.to_h)
+          if domain_validation.errors.any?
+            raise Domain::Errors::ValidationError.new(domain_validation.errors.to_h)
+          end
+
+          domain_validation.to_h
         end
 
         def find_patient(patient_id)
           patient = @patient_repository.find_by_id(patient_id)
 
           unless patient
-            raise ActiveRecord::RecordNotFound
+            raise Domain::Errors::PatientNotFoundError
           end
 
           patient
@@ -71,7 +76,7 @@ module Arkham
             }
           )
         rescue StandardError => e
-          raise Errors::Patient::PatientPhotoError, "Error on save patient photo! Error: #{e}"
+          raise Domain::Errors::PatientPhotoError.new("Error on save patient photo! Error: #{e}")
         end
 
         def log_photo_error(patient_id, patient_photo)
