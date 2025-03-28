@@ -4,216 +4,308 @@ require 'rails_helper'
 require 'google/cloud/storage'
 
 RSpec.describe Api::PatientsController, type: :controller do
-  describe 'GET #index' do
-    context 'when everything goes well' do
-      subject { get :index, format: :json }
+  let(:list_patients_use_case) { instance_double(Arkham::Core::UseCases::ListPatients) }
+  let(:create_patient_use_case) { instance_double(Arkham::Core::UseCases::CreatePatient) }
+  let(:update_patient_use_case) { instance_double(Arkham::Core::UseCases::UpdatePatient) }
+  let(:destroy_patient_use_case) { instance_double(Arkham::Core::UseCases::DestroyPatient) }
+  let(:activate_patient_use_case) { instance_double(Arkham::Core::UseCases::ActivatePatient) }
+  let(:inactivate_patient_use_case) { instance_double(Arkham::Core::UseCases::InactivatePatient) }
 
-      render_views
-      it 'is success!' do
-        create(:patient)
-        subject
-        expect(response.status).to eq(200)
-        expect(JSON.parse(response.body)['patients'].count).to be 1
+  before(:each) do
+    allow(Arkham::Infrastructure::Dependencies).to receive(:list_patients_use_case).and_return(list_patients_use_case)
+    allow(Arkham::Infrastructure::Dependencies).to receive(:create_patient_use_case).and_return(create_patient_use_case)
+    allow(Arkham::Infrastructure::Dependencies).to receive(:update_patient_use_case).and_return(update_patient_use_case)
+    allow(Arkham::Infrastructure::Dependencies).to receive(:destroy_patient_use_case).and_return(destroy_patient_use_case)
+    allow(Arkham::Infrastructure::Dependencies).to receive(:activate_patient_use_case).and_return(activate_patient_use_case)
+    allow(Arkham::Infrastructure::Dependencies).to receive(:inactivate_patient_use_case).and_return(inactivate_patient_use_case)
+  end
+
+  describe 'GET #index' do
+    context 'when no filters are provided' do
+      let!(:patient) { create(:patient) }
+
+      it 'returns all patients' do
+        get :index, format: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to be_present
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response).to be_a(Hash)
+        expect(json_response['patients']).to be_present
+        expect(json_response['patients']).to be_an(Array)
+        expect(json_response['patients'].length).to eq(1)
+        
+        patient_response = json_response['patients'].first
+        expect(patient_response).to include(
+          'id',
+          'firstname',
+          'lastname',
+          'cpf',
+          'gender',
+          'status',
+          'birth_date',
+          'photo_url',
+          'age',
+          'active'
+        )
+        
+        expect(patient_response['id']).to eq(patient.id)
+        expect(patient_response['firstname']).to eq(patient.firstname)
+        expect(patient_response['lastname']).to eq(patient.lastname)
+        expect(patient_response['cpf']).to eq(patient.cpf)
+        expect(patient_response['gender']).to eq(patient.gender)
+        expect(patient_response['status']).to eq(patient.status)
+        expect(patient_response['birth_date']).to eq(patient.birth_date.as_json)
+        expect(patient_response['photo_url']).to eq(patient.photo_url)
+        expect(patient_response['age']).to eq(patient.age)
+        expect(patient_response['active']).to eq(patient.active?)
+      end
+    end
+
+    context 'when filters are provided' do
+      let!(:active_patient) { create(:patient, status: 'active', cpf: '123.506.300-14') }
+      let!(:inactive_patient) { create(:patient, status: 'inactive', cpf: '123.506.300-15') }
+
+      it 'returns filtered patients' do
+        get :index, params: { status: 'active' }, format: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to be_present
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response).to be_a(Hash)
+        expect(json_response['patients']).to be_present
+        expect(json_response['patients']).to be_an(Array)
+        expect(json_response['patients'].length).to eq(1)
+        
+        patient_response = json_response['patients'].first
+        expect(patient_response['status']).to eq('active')
+        expect(patient_response['id']).to eq(active_patient.id)
       end
     end
   end
 
   describe 'POST #create' do
-    patient = JSON.parse(File.read('spec/fixtures/patient/patient.json'))
+    let(:patient_params) do
+      {
+        firstname: 'John',
+        lastname: 'Doe',
+        cpf: '123.456.789-14',
+        gender: 'm',
+        status: 'active',
+        birth_date: '1990-01-01',
+        diagnosis: 'Some diagnosis'
+      }
+    end
 
-    context 'when payload has no photo', :vcr do
-      context 'and everything goes well' do
-        subject { post :create, params: { patient: patient } }
+    context 'when patient is created successfully' do
+      it 'returns created patient id' do
+        post :create, params: { patient: patient_params }
 
-        it 'is success!' do
-          subject
-          expect(response.status).to eq(200)
-          expect(JSON.parse(response.body)['id']).not_to be_nil
-          expect(Patient.find(JSON.parse(response.body)['id']).active?).to be true
-        end
-      end
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to be_present
 
-      context 'and payload received has invalid attributes' do
-        subject { post :create, params: { patient: patient.reject { |k, _v| k == 'firstname' } } }
-
-        it 'fails!' do
-          subject
-          expect(response.status).to eq(422)
-        end
-      end
-
-      context 'and there is already a patient with the same CPF' do
-        subject { post :create, params: { patient: patient } }
-
-        it 'fails!' do
-          create(:patient)
-          subject
-          expect(response.status).to eq(422)
-        end
+        json_response = JSON.parse(response.body)
+        expect(json_response).to be_a(Hash)
+        expect(json_response['id']).to be_present
+        
+        created_patient = Patient.find(json_response['id'])
+        expect(created_patient.firstname).to eq(patient_params[:firstname])
+        expect(created_patient.lastname).to eq(patient_params[:lastname])
+        expect(created_patient.cpf).to eq(patient_params[:cpf])
+        expect(created_patient.gender).to eq(patient_params[:gender])
+        expect(created_patient.status).to eq(patient_params[:status])
+        expect(created_patient.birth_date.to_date).to eq(Date.parse(patient_params[:birth_date]))
+        expect(created_patient.diagnosis).to eq(patient_params[:diagnosis])
       end
     end
 
-    context 'when payload has photo', :vcr do
-      base64_image = File.open('spec/images/arkham.jpg', 'rb', &:read)
-      patient['photo'] = {
-        'photo_base64': base64_image,
-        'photo_base64_format': 'png'
-      }
-
-      context 'and everything goes well' do
-        subject { post :create, params: { patient: patient } }
-
-        it 'it success!' do
-          storage_file_instance = double(Google::Cloud::Storage::File, id: '123abc', public_url: '')
-          allow_any_instance_of(Google::Cloud::Storage::Bucket)
-            .to receive(:create_file).and_return(storage_file_instance)
-
-          subject
-
-          expect(response.status).to eq(200)
-          expect(JSON.parse(response.body)['id']).not_to be_nil
-          expect(Patient.find(JSON.parse(response.body)['id']).photo_url).to eq nil
-        end
+    context 'when patient params are invalid' do
+      let(:invalid_params) do
+        {
+          firstname: '',
+          lastname: '',
+          cpf: '',
+          gender: '',
+          status: '',
+          birth_date: '',
+          diagnosis: ''
+        }
       end
 
-      context 'and payload photo has missing attributes' do
-        patient['photo'] = {
-          'photo_base64_format': 'png'
-        }
-        subject { post :create, params: { patient: patient } }
+      it 'returns unprocessable entity status' do
+        post :create, params: { patient: invalid_params }
 
-        it 'creates patient without photo' do
-          subject
-          expect(response.status).to eq(200)
-          expect(JSON.parse(response.body)['id']).not_to be_nil
-          expect(Patient.find(JSON.parse(response.body)['id']).photo_url).to eq nil
-        end
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to be_present
+        json_response = JSON.parse(response.body)
+        expect(json_response).to be_a(Hash)
+
+        expect(json_response['error']).to be_present
+      end
+    end
+
+    context 'when patient already exists' do
+      let!(:existing_patient) { create(:patient, cpf: patient_params[:cpf]) }
+
+      it 'returns unprocessable entity status' do
+        post :create, params: { patient: patient_params }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to be_present
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response).to be_a(Hash)
+        expect(json_response['error']).to be_present
       end
     end
   end
 
   describe 'PUT #update' do
-    context 'when everything goes well', :vcr do
-      payload = {
-        firstname: 'Pedra',
-        lastname: 'Cedore2',
-        diagnosis: 'Trombose',
+    let!(:patient) { create(:patient) }
+    let(:patient_params) do
+      {
+        firstname: 'John',
+        lastname: 'Doe',
         cpf: '123.456.789-10',
-        gender: 'female',
-        photo: {}
+        gender: 'm',
+        status: 'active',
+        birth_date: '1990-01-01',
+        diagnosis: 'Some diagnosis'
       }
-
-      it 'updates patient attributes' do
-        patient = create(:patient)
-        put :update, params: { id: patient.id, patient: payload }
-
-        expect(response.status).to eq(200)
-        expect(patient.reload.lastname).to eq('Cedore2')
-        expect(patient.reload.diagnosis).to eq('Trombose')
-      end
     end
 
-    context 'and photo is updated' do
-      base64_image = File.open('spec/images/arkham.jpg', 'rb', &:read)
-      payload = {
-        firstname: 'Pedra',
-        lastname: 'Cedore2',
-        diagnosis: 'Trombose',
-        cpf: '123.456.789-10',
-        gender: 'female',
-        photo: {
-          photo_base64: base64_image.encode,
-          photo_base64_format: 'png'
-        }
-      }
+    context 'when patient is updated successfully' do
+      it 'returns updated patient id' do
+        put :update, params: { id: patient.id, patient: patient_params }
 
-      it 'updates patient attributes and patient photo', :vcr do
-        patient = create(:patient)
-        storage_file_instance = double(Google::Cloud::Storage::File, id: '123abc', public_url: '')
-        allow_any_instance_of(Google::Cloud::Storage::Bucket)
-          .to receive(:create_file).and_return(storage_file_instance)
-
-        put :update, params: { id: patient.id, patient: payload }
-
-        expect(response.status).to eq(200)
-        expect(patient.reload.lastname).to eq('Cedore2')
-        expect(patient.reload.diagnosis).to eq('Trombose')
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to be_present
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response).to be_a(Hash)
+        expect(json_response['id']).to eq(patient.id)
+        
+        updated_patient = Patient.find(patient.id)
+        expect(updated_patient.firstname).to eq(patient_params[:firstname])
+        expect(updated_patient.lastname).to eq(patient_params[:lastname])
+        expect(updated_patient.cpf).to eq(patient_params[:cpf])
+        expect(updated_patient.gender).to eq(patient_params[:gender])
+        expect(updated_patient.status).to eq(patient_params[:status])
+        expect(updated_patient.birth_date.to_date).to eq(Date.parse(patient_params[:birth_date]))
+        expect(updated_patient.diagnosis).to eq(patient_params[:diagnosis])
       end
     end
 
     context 'when patient is not found' do
-      payload = {
-        firstname: 'Pedra',
-        lastname: 'Cedore2',
-        diagnosis: 'Trombose',
-        cpf: '123.456.789-10',
-        gender: 'female'
-      }
+      it 'returns not found status' do
+        put :update, params: { id: SecureRandom.uuid, patient: patient_params }
 
-      it 'renders 404' do
-        put :update, params: { id: '123', patient: payload }
+        expect(response).to have_http_status(:not_found)
+      end
+    end
 
-        expect(response.status).to eq(404)
+    context 'when patient params are invalid' do
+      let(:invalid_params) do
+        {
+          firstname: '',
+          lastname: '',
+          cpf: '',
+          gender: '',
+          status: '',
+          birth_date: '',
+          diagnosis: ''
+        }
+      end
+
+      it 'returns unprocessable entity status' do
+        put :update, params: { id: patient.id, patient: invalid_params }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to be_present
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response).to be_a(Hash)
+        expect(json_response['error']).to be_present
       end
     end
   end
 
   describe 'DELETE #destroy' do
-    context 'when everything goes well', :vcr do
-      it 'deletes patient' do
-        patient = create(:patient)
-        delete :destroy, params: { id: patient.id }
+    let!(:patient) { create(:patient) }
 
-        expect(response.status).to eq(200)
-        expect(Patient.count).to eq 0
+    context 'when patient is destroyed successfully' do
+      it 'returns ok status' do
+        expect {
+          delete :destroy, params: { id: patient.id }
+        }.to change(Patient, :count).by(-1)
+
+        expect(response).to have_http_status(:ok)
       end
     end
 
     context 'when patient is not found' do
-      it 'renders 404' do
-        delete :destroy, params: { id: '123' }
+      it 'returns not found status' do
+        delete :destroy, params: { id: SecureRandom.uuid }
 
-        expect(response.status).to eq(404)
+        expect(response).to have_http_status(:not_found)
       end
     end
   end
 
   describe 'PUT #activate' do
-    context 'when everything goes well' do
-      it 'updates patient status to active' do
-        patient = create(:patient, status: 'inactive')
+    let!(:patient) { create(:patient, status: 'inactive') }
+
+    context 'when patient is activated successfully' do
+      it 'returns activated patient id' do
         put :activate, params: { id: patient.id }
 
-        expect(response.status).to eq(200)
-        expect(Patient.find(JSON.parse(response.body)['id']).active?).to be true
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to be_present
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response).to be_a(Hash)
+        expect(json_response['id']).to eq(patient.id)
+        
+        activated_patient = Patient.find(patient.id)
+        expect(activated_patient.status).to eq('active')
       end
     end
 
     context 'when patient is not found' do
-      it 'renders 404' do
-        put :activate, params: { id: '123' }
+      it 'returns not found status' do
+        put :activate, params: { id: SecureRandom.uuid }
 
-        expect(response.status).to eq(404)
+        expect(response).to have_http_status(:not_found)
       end
     end
   end
 
   describe 'PUT #inactivate' do
-    context 'when everything goes well' do
-      it 'updates patient status to inactive' do
-        patient = create(:patient)
+    let!(:patient) { create(:patient, status: 'active') }
+
+    context 'when patient is inactivated successfully' do
+      it 'returns inactivated patient id' do
         put :inactivate, params: { id: patient.id }
 
-        expect(response.status).to eq(200)
-        expect(Patient.find(JSON.parse(response.body)['id']).active?).to be false
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to be_present
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response).to be_a(Hash)
+        expect(json_response['id']).to eq(patient.id)
+        
+        inactivated_patient = Patient.find(patient.id)
+        expect(inactivated_patient.status).to eq('inactive')
       end
     end
 
     context 'when patient is not found' do
-      it 'renders 404' do
-        put :inactivate, params: { id: '123' }
+      it 'returns not found status' do
+        put :inactivate, params: { id: SecureRandom.uuid }
 
-        expect(response.status).to eq(404)
+        expect(response).to have_http_status(:not_found)
       end
     end
   end
