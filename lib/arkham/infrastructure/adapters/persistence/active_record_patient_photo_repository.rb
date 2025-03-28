@@ -3,7 +3,7 @@ module Arkham
     module Adapters
       module Persistence
         class ActiveRecordPatientPhotoRepository
-          include Arkham::AppCore::Ports::Output::PatientPhotoRepositoryPort
+          include Arkham::Core::Ports::Output::PatientPhotoRepositoryPort
 
           def initialize(model = {})
             @patient_photo = model.fetch(:patient_photo) { ::PatientPhoto }

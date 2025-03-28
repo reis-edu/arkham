@@ -3,7 +3,7 @@ module Arkham
     module Adapters
       module Persistence
         class ActiveRecordPatientRepository
-          include Arkham::AppCore::Ports::Output::PatientRepositoryPort
+          include Arkham::Core::Ports::Output::PatientRepositoryPort
 
           def find_all(filter_params = {})
             patients = ::Patient.where(filter_params).all

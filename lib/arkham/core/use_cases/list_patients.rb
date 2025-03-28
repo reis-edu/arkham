@@ -1,5 +1,5 @@
 module Arkham
-  module AppCore
+  module Core
     module UseCases
       class ListPatients
         def initialize(patient_repository)

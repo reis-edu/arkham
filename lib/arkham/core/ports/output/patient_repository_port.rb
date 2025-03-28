@@ -1,5 +1,5 @@
 module Arkham
-  module AppCore
+  module Core
     module Ports
       module Output
         module PatientRepositoryPort

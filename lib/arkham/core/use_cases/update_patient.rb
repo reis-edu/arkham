@@ -1,19 +1,20 @@
 module Arkham
-  module AppCore
+  module Core
     module UseCases
-      class CreatePatient
+      class UpdatePatient
         def initialize(patient_repository, patient_photo_repository)
           @patient_repository = patient_repository
           @patient_photo_repository = patient_photo_repository
         end
-        
-        def execute(patient_params)
+
+        def execute(patient_id, patient_params)
           validated_params = validate_patient_params(patient_params)
-          check_patient_exists(validated_params[:cpf])
+
+          patient = find_patient(patient_id)
 
           ActiveRecord::Base.transaction do
             photo_params = validated_params.delete(:photo)
-            patient_id = @patient_repository.create(validated_params)
+            @patient_repository.update(patient_id, validated_params)
 
             if photo_params.present? && photo_params[:photo_base64].present?
               process_patient_photo(patient_id, photo_params)
@@ -22,9 +23,9 @@ module Arkham
             patient_id
           end
         end
-        
+
         private
-        
+
         def validate_patient_params(params)
           patient_validation = Schemas::Patient.new.call(params)
 
@@ -34,11 +35,15 @@ module Arkham
 
           patient_validation.to_h
         end
-        
-        def check_patient_exists(cpf)
-          if ::Patient.exists?(cpf: cpf)
-            raise Errors::Patient::PatientAlreadyExistsError, 'Patient with this CPF already exists!'
+
+        def find_patient(patient_id)
+          patient = @patient_repository.find_by_id(patient_id)
+
+          unless patient
+            raise ActiveRecord::RecordNotFound
           end
+
+          patient
         end
 
         def process_patient_photo(patient_id, photo_params)
@@ -54,7 +59,7 @@ module Arkham
             log_photo_error(patient_id, photo_params)
           end
         end
-        
+
         def save_patient_photo(patient_photo, patient_id)
           @patient_photo_repository.save(patient_photo)
 

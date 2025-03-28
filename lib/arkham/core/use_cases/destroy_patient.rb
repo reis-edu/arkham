@@ -1,17 +1,17 @@
 module Arkham
-  module AppCore
+  module Core
     module UseCases
-      class InactivatePatient
+      class DestroyPatient
         def initialize(patient_repository)
           @patient_repository = patient_repository
         end
-
+        
         def execute(patient_id)
           patient = find_patient(patient_id)
 
-          @patient_repository.inactivate(patient_id)
-
-          patient_id
+          ActiveRecord::Base.transaction do
+            @patient_repository.destroy(patient_id)
+          end
         end
         
         private
