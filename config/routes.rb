@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   end
 
   namespace :api, defaults: { format: 'json' } do
-    resources :patients,    only: %i[index create update destroy]
+    resources :patients,    only: %i[index show create update destroy]
 
     put '/patients/:id/activate',      to: 'patients#activate'
     put '/patients/:id/inactivate',    to: 'patients#inactivate'
