@@ -4,20 +4,20 @@ require 'rails_helper'
 require 'google/cloud/storage'
 
 RSpec.describe Api::PatientsController, type: :controller do
-  let(:list_patients_use_case) { instance_double(Arkham::Core::UseCases::ListPatients) }
-  let(:create_patient_use_case) { instance_double(Arkham::Core::UseCases::CreatePatient) }
-  let(:update_patient_use_case) { instance_double(Arkham::Core::UseCases::UpdatePatient) }
-  let(:destroy_patient_use_case) { instance_double(Arkham::Core::UseCases::DestroyPatient) }
-  let(:activate_patient_use_case) { instance_double(Arkham::Core::UseCases::ActivatePatient) }
-  let(:inactivate_patient_use_case) { instance_double(Arkham::Core::UseCases::InactivatePatient) }
+  let(:list_patients_use_case) { instance_double(Arkham::UseCases::ListPatients) }
+  let(:create_patient_use_case) { instance_double(Arkham::UseCases::CreatePatient) }
+  let(:update_patient_use_case) { instance_double(Arkham::UseCases::UpdatePatient) }
+  let(:destroy_patient_use_case) { instance_double(Arkham::UseCases::DestroyPatient) }
+  let(:activate_patient_use_case) { instance_double(Arkham::UseCases::ActivatePatient) }
+  let(:inactivate_patient_use_case) { instance_double(Arkham::UseCases::InactivatePatient) }
 
   before(:each) do
-    allow(Arkham::Infrastructure::Dependencies).to receive(:list_patients_use_case).and_return(list_patients_use_case)
-    allow(Arkham::Infrastructure::Dependencies).to receive(:create_patient_use_case).and_return(create_patient_use_case)
-    allow(Arkham::Infrastructure::Dependencies).to receive(:update_patient_use_case).and_return(update_patient_use_case)
-    allow(Arkham::Infrastructure::Dependencies).to receive(:destroy_patient_use_case).and_return(destroy_patient_use_case)
-    allow(Arkham::Infrastructure::Dependencies).to receive(:activate_patient_use_case).and_return(activate_patient_use_case)
-    allow(Arkham::Infrastructure::Dependencies).to receive(:inactivate_patient_use_case).and_return(inactivate_patient_use_case)
+    allow(Arkham::Dependencies).to receive(:list_patients_use_case).and_return(list_patients_use_case)
+    allow(Arkham::Dependencies).to receive(:create_patient_use_case).and_return(create_patient_use_case)
+    allow(Arkham::Dependencies).to receive(:update_patient_use_case).and_return(update_patient_use_case)
+    allow(Arkham::Dependencies).to receive(:destroy_patient_use_case).and_return(destroy_patient_use_case)
+    allow(Arkham::Dependencies).to receive(:activate_patient_use_case).and_return(activate_patient_use_case)
+    allow(Arkham::Dependencies).to receive(:inactivate_patient_use_case).and_return(inactivate_patient_use_case)
   end
 
   describe 'GET #index' do
