@@ -1,6 +1,19 @@
 class ApplicationController < ActionController::Base
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
+  rescue_from Arkham::Domain::Errors::PatientNotFoundError do |e|
+    render json: { error: e.message }, status: :not_found
+  end
+
+  rescue_from Arkham::Domain::Errors::PatientAlreadyExistsError do |e|
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  rescue_from Arkham::Domain::Errors::PatientPhotoError do |e|
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  rescue_from Arkham::Validators::Errors::ApiValidationError do |e|
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
 
   def authorize_visitor_request
     header = request.headers['Authorization']

@@ -8,6 +8,10 @@ module Arkham
       @patient_photo_repository ||= Repository::ActiveRecord::PatientPhotoRepository.new
     end
 
+    def self.show_patient_use_case
+      @show_patient_use_case ||= UseCases::ShowPatient.new(patient_repository)
+    end
+
     def self.list_patients_use_case
       @list_patients_use_case ||= UseCases::ListPatients.new(patient_repository)
     end

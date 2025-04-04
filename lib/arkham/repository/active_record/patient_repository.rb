@@ -2,6 +2,12 @@ module Arkham
   module Repository
     module ActiveRecord
       class PatientRepository
+        def within_transaction(&block)
+          ::ActiveRecord::Base.transaction do
+            yield if block_given?
+          end
+        end
+
         def find_all(filter_params = {})
           patients = ::Patient.where(filter_params).all
           patients.map { |patient| map_to_entity(patient) }
@@ -42,19 +48,26 @@ module Arkham
           patient.id
         end
 
+        def find_by_cpf(cpf)
+          patient = ::Patient.find_by(cpf: cpf)
+          return nil unless patient
+          
+          map_to_entity(patient)
+        end
+
         private
 
-        def map_to_entity(record)
+        def map_to_entity(patient)
           Arkham::Domain::Entities::Patient.new(
-            id: record.id,
-            firstname: record.firstname,
-            lastname: record.lastname,
-            cpf: record.cpf,
-            gender: record.gender,
-            status: record.status,
-            birth_date: record.birth_date,
-            photo_url: record.photo_url,
-            photo_key: record.photo_key
+            id: patient.id,
+            firstname: patient.firstname,
+            lastname: patient.lastname,
+            cpf: patient.cpf,
+            gender: patient.gender,
+            status: patient.status,
+            birth_date: patient.birth_date,
+            photo_url: patient.photo_url,
+            photo_key: patient.photo_key
           )
         end
       end

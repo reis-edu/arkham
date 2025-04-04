@@ -19,7 +19,7 @@ module Arkham
         patient = @patient_repository.find_by_id(patient_id)
 
         unless patient
-          raise Arkham::Domain::Errors::PatientNotFoundError
+          raise Arkham::Domain::Errors::PatientNotFoundError, 'Patient not found'
         end
 
         patient

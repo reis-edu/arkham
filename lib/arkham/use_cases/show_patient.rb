@@ -1,16 +1,12 @@
 module Arkham
   module UseCases
-    class ActivatePatient
+    class ShowPatient
       def initialize(patient_repository)
         @patient_repository = patient_repository
       end
 
       def execute(patient_id)
-        patient = find_patient(patient_id)
-
-        @patient_repository.activate(patient_id)
-
-        patient_id
+        find_patient(patient_id)
       end
 
       private
