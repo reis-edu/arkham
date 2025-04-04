@@ -3,8 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::CreatePatient do
-  let(:patient_repository) { instance_double('PatientRepository') }
-  let(:patient_photo_repository) { instance_double('PatientPhotoRepository') }
+  let(:mock_photo) do
+    double(
+      'PatientPhoto',
+      photo_url: 'https://storage.googleapis.com/mock-bucket/mock-photo.jpg',
+      photo_key: 'mock-photo-key'
+    )
+  end
+  let(:patient_repository) { instance_double('PatientRepository', find_by_cpf: nil) }
+  let(:patient_photo_repository) { instance_double('PatientPhotoRepository', load: mock_photo) }
   let(:use_case) { described_class.new(patient_repository, patient_photo_repository) }
 
   describe '#execute' do
@@ -31,7 +38,10 @@ RSpec.describe Arkham::UseCases::CreatePatient do
     context 'when params are valid' do
       before do
         allow(patient_repository).to receive(:create).and_return(1)
-        allow(Patient).to receive(:exists?).with(cpf: valid_params[:cpf]).and_return(false)
+        allow(patient_repository).to receive(:exists?).with(cpf: valid_params[:cpf]).and_return(false)
+        allow(patient_repository).to receive(:within_transaction) do |&block|
+          block.call
+        end
       end
 
       it 'creates a new patient' do
@@ -46,7 +56,10 @@ RSpec.describe Arkham::UseCases::CreatePatient do
 
     context 'when patient already exists' do
       before do
-        allow(Patient).to receive(:exists?).with(cpf: valid_params[:cpf]).and_return(true)
+        allow(patient_repository).to receive(:find_by_cpf).and_return(true)
+        allow(patient_repository).to receive(:within_transaction) do |&block|
+          block.call
+        end
       end
 
       it 'raises PatientAlreadyExistsError' do
@@ -114,6 +127,9 @@ RSpec.describe Arkham::UseCases::CreatePatient do
       before do
         allow(Patient).to receive(:exists?).with(cpf: valid_params[:cpf]).and_return(false)
         allow(patient_repository).to receive(:create).and_raise(ActiveRecord::RecordInvalid.new(Patient.new))
+        allow(patient_repository).to receive(:within_transaction) do |&block|
+          block.call
+        end
       end
 
       it 'raises ActiveRecord::RecordInvalid' do
@@ -125,6 +141,9 @@ RSpec.describe Arkham::UseCases::CreatePatient do
       before do
         allow(Patient).to receive(:exists?).with(cpf: valid_params[:cpf]).and_return(false)
         allow(patient_repository).to receive(:create).and_raise(StandardError.new('Database error'))
+        allow(patient_repository).to receive(:within_transaction) do |&block|
+          block.call
+        end
       end
 
       it 'raises StandardError' do
@@ -142,14 +161,6 @@ RSpec.describe Arkham::UseCases::CreatePatient do
         )
       end
 
-      let(:mock_photo) do
-        double(
-          'PatientPhoto',
-          photo_url: 'https://storage.googleapis.com/mock-bucket/mock-photo.jpg',
-          photo_key: 'mock-photo-key'
-        )
-      end
-
       before do
         allow(patient_repository).to receive(:create).and_return(1)
         allow(Patient).to receive(:exists?).with(cpf: valid_params[:cpf]).and_return(false)
@@ -157,6 +168,9 @@ RSpec.describe Arkham::UseCases::CreatePatient do
         allow(patient_photo_repository).to receive(:save).and_return(mock_photo)
         allow(patient_repository).to receive(:update)
         allow(PatientPhoto).to receive(:new).and_return(mock_photo)
+        allow(patient_repository).to receive(:within_transaction) do |&block|
+          block.call
+        end
       end
 
       it 'processes the photo' do

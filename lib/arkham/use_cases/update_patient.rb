@@ -12,7 +12,8 @@ module Arkham
         validated_params = validate_patient_params(patient_params)
         patient = find_patient(patient_id)
 
-        ActiveRecord::Base.transaction do
+        @patient_repository.within_transaction do
+          check_duplicate_cpf(patient_id, validated_params[:cpf]) if validated_params[:cpf].present?
           photo_params = validated_params.delete(:photo)
           @patient_repository.update(patient_id, validated_params)
 
@@ -26,10 +27,17 @@ module Arkham
 
       private
 
+      def check_duplicate_cpf(patient_id, new_cpf)
+        existing_patient = @patient_repository.find_by_cpf(new_cpf)
+        if existing_patient && existing_patient.id != patient_id
+          raise Domain::Errors::PatientAlreadyExistsError, 'Patient with this CPF already exists!'
+        end
+      end
+
       def validate_patient_params(args)
         patient_params = Validators::Api::PatientContract.new.call(args)
         if patient_params.errors.any?
-          raise Validators::Errors::ApiValidationError.new(patient_params.errors.to_h)
+          raise Validators::Errors::ApiValidationError.new(patient_params.errors.to_h), 'Patient params are not valid!'
         end
 
         patient_params.to_h
@@ -39,14 +47,14 @@ module Arkham
         patient = @patient_repository.find_by_id(patient_id)
 
         unless patient
-          raise Domain::Errors::PatientNotFoundError
+          raise Domain::Errors::PatientNotFoundError, 'Patient not found'
         end
 
         patient
       end
 
       def process_patient_photo(patient_id, photo_params)
-        patient_photo = PatientPhoto.new(
+        patient_photo = @patient_photo_repository.load(
           patient_id, 
           photo_params[:photo_base64],
           photo_params[:photo_base64_format]

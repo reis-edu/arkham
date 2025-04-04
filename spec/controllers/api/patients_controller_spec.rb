@@ -10,6 +10,10 @@ RSpec.describe Api::PatientsController, type: :controller do
   let(:destroy_patient_use_case) { instance_double(Arkham::UseCases::DestroyPatient) }
   let(:activate_patient_use_case) { instance_double(Arkham::UseCases::ActivatePatient) }
   let(:inactivate_patient_use_case) { instance_double(Arkham::UseCases::InactivatePatient) }
+  let(:show_patient_use_case) { instance_double('Arkham::UseCases::ShowPatient') }
+  let(:patient) { double('Patient') }
+  let(:patient_presenter) { double('Arkham::Presenters::PatientPresenter') }
+  let(:patient_json) { { id: 1, name: 'John Doe' }.to_json }
 
   before(:each) do
     allow(Arkham::Dependencies).to receive(:list_patients_use_case).and_return(list_patients_use_case)
@@ -18,6 +22,8 @@ RSpec.describe Api::PatientsController, type: :controller do
     allow(Arkham::Dependencies).to receive(:destroy_patient_use_case).and_return(destroy_patient_use_case)
     allow(Arkham::Dependencies).to receive(:activate_patient_use_case).and_return(activate_patient_use_case)
     allow(Arkham::Dependencies).to receive(:inactivate_patient_use_case).and_return(inactivate_patient_use_case)
+    allow(Arkham::Dependencies).to receive(:show_patient_use_case).and_return(show_patient_use_case)
+    allow(patient_presenter).to receive(:to_json).and_return(patient_json)
   end
 
   describe 'GET #index' do
@@ -305,6 +311,25 @@ RSpec.describe Api::PatientsController, type: :controller do
       it 'returns not found status' do
         put :inactivate, params: { id: SecureRandom.uuid }
 
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
+  describe 'GET #show' do
+    let!(:patient) { create(:patient) }
+
+    context 'when patient exists' do
+      it 'returns the patient as JSON' do
+        get :show, params: { id: patient.id }
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)['id']).to eq(patient.id)
+      end
+    end
+
+    context 'when patient does not exist' do
+      it 'returns not found status' do
+        get :show, params: { id: '123' }
         expect(response).to have_http_status(:not_found)
       end
     end

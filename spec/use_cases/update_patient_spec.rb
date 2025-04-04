@@ -3,8 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::UpdatePatient do
-  let(:patient_repository) { instance_double('PatientRepository') }
-  let(:patient_photo_repository) { instance_double('PatientPhotoRepository') }
+  let(:mock_photo) do
+    double(
+      'PatientPhoto',
+      photo_url: 'https://storage.googleapis.com/mock-bucket/mock-photo.jpg',
+      photo_key: 'mock-photo-key'
+    )
+  end
+  let(:patient_repository) { instance_double('PatientRepository', within_transaction: nil, find_by_cpf: instance_double('Arkham::Domain::Entities::Patient', id: '123')) }
+  let(:patient_photo_repository) { instance_double('PatientPhotoRepository', load: mock_photo) }
   let(:use_case) { described_class.new(patient_repository, patient_photo_repository) }
 
   describe '#execute' do
@@ -33,6 +40,10 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
       before do
         allow(patient_repository).to receive(:find_by_id).with(patient_id).and_return(double('Patient'))
         allow(patient_repository).to receive(:update)
+        allow(patient_repository).to receive(:find_by_cpf).and_return(nil)
+        allow(patient_repository).to receive(:within_transaction) do |&block|
+          block.call
+        end
       end
 
       it 'updates the patient' do
@@ -43,11 +54,39 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
       it 'returns the patient id' do
         expect(use_case.execute(patient_id, valid_params)).to eq(patient_id)
       end
+
+      context 'when trying to update to an existing CPF' do
+        let(:existing_patient) { double('Patient', id: 2) }
+
+        before do
+          allow(patient_repository).to receive(:find_by_cpf).with(valid_params[:cpf]).and_return(existing_patient)
+        end
+
+        it 'raises PatientAlreadyExistsError' do
+          expect { use_case.execute(patient_id, valid_params) }.to raise_error(Arkham::Domain::Errors::PatientAlreadyExistsError)
+        end
+      end
+
+      context 'when updating to own CPF' do
+        let(:existing_patient) { double('Patient', id: patient_id) }
+
+        before do
+          allow(patient_repository).to receive(:find_by_cpf).with(valid_params[:cpf]).and_return(existing_patient)
+        end
+
+        it 'allows the update' do
+          expect(patient_repository).to receive(:update).with(patient_id, expected_params)
+          use_case.execute(patient_id, valid_params)
+        end
+      end
     end
 
     context 'when patient does not exist' do
       before do
         allow(patient_repository).to receive(:find_by_id).with(patient_id).and_return(nil)
+        allow(patient_repository).to receive(:within_transaction) do |&block|
+          block.call
+        end
       end
 
       it 'raises PatientNotFoundError' do
@@ -61,6 +100,9 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
 
         before do
           allow(patient_repository).to receive(:find_by_id).with(patient_id).and_return(double('Patient'))
+          allow(patient_repository).to receive(:within_transaction) do |&block|
+            block.call
+          end
         end
 
         it 'raises ApiValidationError' do
@@ -134,7 +176,11 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
     context 'when database transaction fails' do
       before do
         allow(patient_repository).to receive(:find_by_id).with(patient_id).and_return(double('Patient'))
+        allow(patient_repository).to receive(:find_by_cpf).and_return(nil)
         allow(patient_repository).to receive(:update).and_raise(ActiveRecord::RecordInvalid.new(Patient.new))
+        allow(patient_repository).to receive(:within_transaction) do |&block|
+          block.call
+        end
       end
 
       it 'raises ActiveRecord::RecordInvalid' do
@@ -146,6 +192,9 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
       before do
         allow(patient_repository).to receive(:find_by_id).with(patient_id).and_return(double('Patient'))
         allow(patient_repository).to receive(:update).and_raise(StandardError.new('Database error'))
+        allow(patient_repository).to receive(:within_transaction) do |&block|
+          block.call
+        end
       end
 
       it 'raises StandardError' do
@@ -163,14 +212,6 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
         )
       end
 
-      let(:mock_photo) do
-        double(
-          'PatientPhoto',
-          photo_url: 'https://storage.googleapis.com/mock-bucket/mock-photo.jpg',
-          photo_key: 'mock-photo-key'
-        )
-      end
-
       before do
         allow(patient_repository).to receive(:find_by_id).with(patient_id).and_return(double('Patient'))
         allow(patient_repository).to receive(:update)
@@ -178,6 +219,10 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
         allow(patient_photo_repository).to receive(:save).and_return(mock_photo)
         allow(patient_repository).to receive(:update)
         allow(PatientPhoto).to receive(:new).and_return(mock_photo)
+        allow(patient_repository).to receive(:find_by_cpf).and_return(nil)
+        allow(patient_repository).to receive(:within_transaction) do |&block|
+          block.call
+        end
       end
 
       it 'processes the photo' do

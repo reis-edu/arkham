@@ -3,6 +3,7 @@
 module Api
   class PatientsController < ApplicationController
     def initialize(repositories = {})
+      @show_patient_use_case = Arkham::Dependencies.show_patient_use_case
       @list_patients_use_case = Arkham::Dependencies.list_patients_use_case
       @create_patient_use_case = Arkham::Dependencies.create_patient_use_case
       @update_patient_use_case = Arkham::Dependencies.update_patient_use_case
@@ -18,13 +19,16 @@ module Api
       render json: Arkham::Presenters::PatientListPresenter.new(patients).to_json
     end
 
+    def show
+      patient = @show_patient_use_case.execute(params[:id])
+      render json: Arkham::Presenters::PatientPresenter.new(patient).to_json
+    end
+
     def create
       patient_params = permitted_params.to_h
       patient_id = @create_patient_use_case.execute(patient_params)
 
       render json: Arkham::Presenters::PatientCreatedPresenter.new(patient_id).to_json
-    rescue StandardError => e
-      render json: { error: e.message }, status: :unprocessable_entity
     end
 
     def update
@@ -32,32 +36,22 @@ module Api
       patient_id = @update_patient_use_case.execute(params[:id], patient_params)
 
       render json: Arkham::Presenters::PatientUpdatedPresenter.new(patient_id).to_json
-    rescue Arkham::Domain::Errors::PatientNotFoundError
-      head(:not_found)
-    rescue StandardError => e
-      render json: { error: e.message }, status: :unprocessable_entity
     end
 
     def destroy
       @destroy_patient_use_case.execute(params[:id])
 
       head(:ok)
-    rescue Arkham::Domain::Errors::PatientNotFoundError
-      head(:not_found)
     end
 
     def activate
       patient_id = @activate_patient_use_case.execute(params[:id])
       render json: Arkham::Presenters::PatientUpdatedPresenter.new(patient_id).to_json
-    rescue Arkham::Domain::Errors::PatientNotFoundError
-      head(:not_found)
     end
 
     def inactivate
       patient_id = @inactivate_patient_use_case.execute(params[:id])
       render json: Arkham::Presenters::PatientUpdatedPresenter.new(patient_id).to_json
-    rescue Arkham::Domain::Errors::PatientNotFoundError
-      head(:not_found)
     end
 
     private
