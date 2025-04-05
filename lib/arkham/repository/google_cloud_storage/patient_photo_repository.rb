@@ -5,7 +5,7 @@ module Arkham
     module GoogleCloudStorage
       class PatientPhotoRepository
         def initialize(model = {})
-          @patient_photo = model.fetch(:patient_photo) { ::PatientPhoto }
+          @patient_photo = model.fetch(:patient_photo) { PatientPhoto }
         end
 
         def load(patient_id, photo_base64, photo_base64_format)

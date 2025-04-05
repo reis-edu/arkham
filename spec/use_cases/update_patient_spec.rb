@@ -216,7 +216,7 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
         allow(patient_photo_repository).to receive(:valid?).and_return(true)
         allow(patient_photo_repository).to receive(:save).and_return(mock_photo)
         allow(patient_repository).to receive(:update)
-        allow(PatientPhoto).to receive(:new).and_return(mock_photo)
+        allow(Arkham::Repository::GoogleCloudStorage::PatientPhoto).to receive(:new).and_return(mock_photo)
         allow(patient_repository).to receive(:find_by_cpf).and_return(nil)
         allow(patient_repository).to receive(:within_transaction) do |&block|
           block.call
