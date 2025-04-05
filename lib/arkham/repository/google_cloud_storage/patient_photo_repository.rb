@@ -1,6 +1,8 @@
+require 'google/cloud/storage'
+
 module Arkham
   module Repository
-    module ActiveRecord
+    module GoogleCloudStorage
       class PatientPhotoRepository
         def initialize(model = {})
           @patient_photo = model.fetch(:patient_photo) { ::PatientPhoto }

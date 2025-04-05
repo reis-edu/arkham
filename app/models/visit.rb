@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class Visit < ApplicationRecord
   belongs_to :visitor
   belongs_to :patient

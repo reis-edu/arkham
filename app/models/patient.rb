@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class Patient < ApplicationRecord
   has_many :medicament_managements, dependent: :destroy
   has_many :medicaments, through: :medicament_managements

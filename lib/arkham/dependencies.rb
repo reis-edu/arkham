@@ -5,7 +5,7 @@ module Arkham
     end
 
     def self.patient_photo_repository
-      @patient_photo_repository ||= Repository::ActiveRecord::PatientPhotoRepository.new
+      @patient_photo_repository ||= Repository::GoogleCloudStorage::PatientPhotoRepository.new
     end
 
     def self.show_patient_use_case

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 FactoryBot.define do
   factory :vital_sign, class: 'VitalSign' do
     pa            { '14/8' }

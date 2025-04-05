@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Api
   class PatientsController < ApplicationController
     def initialize(repositories = {})
@@ -57,7 +55,7 @@ module Api
     private
 
     def patient_find_params
-      params.except(:format, :action, :controller, :application).permit(:id, :status).to_h
+      params.except(:format, :action, :controller, :application).permit(:status).to_h
     end
 
     def permitted_params
