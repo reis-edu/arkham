@@ -3,6 +3,7 @@ module Arkham
     class PatientPresenter
       def initialize(patient)
         @patient = patient
+        @get_presigned_profile_url_use_case = Arkham::Dependencies.get_presigned_profile_url_use_case
       end
 
       def to_json
@@ -16,9 +17,20 @@ module Arkham
           status: @patient.status,
           birth_date: @patient.birth_date,
           photo_url: @patient.photo_url,
+          presigned_photo_url: presigned_photo_url,
           age: @patient.age,
           active: @patient.active?
         }
+      end
+
+      private
+
+      def presigned_photo_url
+        if @patient.photo_key.present? && @patient.photo_url.present?
+          @get_presigned_profile_url_use_case.execute(@patient.photo_key)
+        else
+          nil
+        end
       end
     end
   end

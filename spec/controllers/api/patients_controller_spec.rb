@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'google/cloud/storage'
 
 RSpec.describe Api::PatientsController, type: :controller do
   let(:list_patients_use_case) { instance_double(Arkham::UseCases::ListPatients) }

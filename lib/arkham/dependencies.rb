@@ -5,7 +5,7 @@ module Arkham
     end
 
     def self.patient_photo_repository
-      @patient_photo_repository ||= Repository::GoogleCloudStorage::PatientPhotoRepository.new
+      @patient_photo_repository ||= Repository::Filebase::PatientPhotoRepository.new
     end
 
     def self.show_patient_use_case
@@ -34,6 +34,10 @@ module Arkham
 
     def self.inactivate_patient_use_case
       @inactivate_patient_use_case ||= UseCases::InactivatePatient.new(patient_repository)
+    end
+
+    def self.get_presigned_profile_url_use_case
+      @get_presigned_profile_url_use_case ||= UseCases::GetPresignedProfileUrl.new(patient_photo_repository)
     end
   end
 end

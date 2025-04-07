@@ -1,12 +1,14 @@
 defaults: &defaults
-  firebase:
-    project_id: 'arkham-aad75'
-    auth_file_path: 'arkham-firebase-key.json'
-    bucket: 'staging.arkham-aad75.appspot.com'
-    patient_path: 'patients'
-    profile_image_format: 'png'
-    acl: 'public_read'
-
+  filebase:
+    region: 'us-east-1'
+    access_key_id: 'CB12B660B4840748F012'
+    secret_access_key: 'GYftNHJUqopVTObB9JxjxTh3GDd7UKiPS2bEcZqw'
+    endpoint: 'https://s3.filebase.com'
+    patient_path: patients
+    bucket: 'arkham'
+    force_path_style: true
+    acl: 'public-read'
+    presigned_url_expiration: 3600
   visits:
     duration: 20
 
@@ -18,10 +20,13 @@ test:
 
 production:
   <<: *defaults
-  firebase:
-    project_id: 'arkham-aad75'
-    auth_file_path: 'arkham-firebase-key.json'
-    bucket: 'arkham-aad75.appspot.com'
-    patient_path: 'patients'
-    profile_image_format: 'png'
-    acl: 'public_read'
+  filebase:
+    region: 'us-east-1'
+    access_key_id: 'CB12B660B4840748F012'
+    secret_access_key: 'GYftNHJUqopVTObB9JxjxTh3GDd7UKiPS2bEcZqw'
+    endpoint: 'https://s3.filebase.com'
+    patient_path: patients
+    bucket: 'arkham'
+    force_path_style: true
+    acl: 'public-read'
+    presigned_url_expiration: 3600

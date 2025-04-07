@@ -10,9 +10,11 @@ Rails.application.routes.draw do
   end
 
   namespace :api, defaults: { format: 'json' } do
+    get '/patients/presigned-profile-url',  to: 'patients#presigned_profile_url'
+
     resources :patients,    only: %i[index show create update destroy]
 
-    put '/patients/:id/activate',      to: 'patients#activate'
-    put '/patients/:id/inactivate',    to: 'patients#inactivate'
+    put '/patients/:id/activate',           to: 'patients#activate'
+    put '/patients/:id/inactivate',         to: 'patients#inactivate'
   end
 end

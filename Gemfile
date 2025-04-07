@@ -19,7 +19,7 @@ gem "bootsnap", require: false
 gem "kamal", require: false
 gem "thruster", require: false
 gem 'dry-validation'
-gem 'google-cloud-storage'
+gem 'aws-sdk-s3'
 gem 'jwt'
 gem 'pg', '>= 0.18', '< 2.0'
 gem 'rabl-rails'

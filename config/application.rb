@@ -21,7 +21,6 @@ module Arkham
     config.time_zone = 'Brasilia'
     config.active_record.default_timezone = :local
 
-    # ✅ Load the YAML settings without Settingslogic
     config.arkham_settings = config_for(:arkham)
   end
 

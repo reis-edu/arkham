@@ -8,6 +8,7 @@ module Api
       @destroy_patient_use_case = Arkham::Dependencies.destroy_patient_use_case
       @activate_patient_use_case = Arkham::Dependencies.activate_patient_use_case
       @inactivate_patient_use_case = Arkham::Dependencies.inactivate_patient_use_case
+      @get_presigned_profile_url_use_case = Arkham::Dependencies.get_presigned_profile_url_use_case
     end
 
     def index
@@ -20,6 +21,11 @@ module Api
     def show
       patient = @show_patient_use_case.execute(params[:id])
       render json: Arkham::Presenters::PatientPresenter.new(patient).to_json
+    end
+
+    def presigned_profile_url
+      presigned_url = @get_presigned_profile_url_use_case.execute(params[:profile_url_key])
+      render json: Arkham::Presenters::PatientPresignedProfileUrlPresenter.new(presigned_url).to_json
     end
 
     def create
