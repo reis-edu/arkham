@@ -15,7 +15,7 @@ module Arkham
           patient_id = @patient_repository.create(new_patient)
 
           if photo_params.present? && photo_params[:photo_base64].present?
-            process_patient_photo(patient_id, photo_params)
+            save_patient_photo(patient_id, photo_params)
           end
 
           patient_id
@@ -40,37 +40,23 @@ module Arkham
         end
       end
 
-      def process_patient_photo(patient_id, photo_params)
-        patient_photo = @patient_photo_repository.load(
+      def save_patient_photo(patient_id, photo_params)
+        patient_photo = @patient_photo_repository.save(
           patient_id, 
           photo_params[:photo_base64],
           photo_params[:photo_base64_format]
         )
 
-        if @patient_photo_repository.valid?(patient_photo)
-          save_patient_photo(patient_photo, patient_id)
-        else
-          log_photo_error(patient_id, photo_params)
-        end
+        update_patient(patient_photo, patient_id)
       end
       
-      def save_patient_photo(patient_photo, patient_id)
-        @patient_photo_repository.save(patient_photo)
-
+      def update_patient(patient_photo, patient_id)
         @patient_repository.update(
           patient_id,
           {
             photo_url: patient_photo.photo_url,
             photo_key: patient_photo.photo_key
           }
-        )
-      rescue StandardError => e
-        raise Domain::Errors::PatientPhotoError, "Error on save patient photo! Error: #{e}"
-      end
-
-      def log_photo_error(patient_id, patient_photo)
-        Arkham.logger.info(
-          "Photo params is not valid: \npatient_id => #{patient_id}\n patient_photo => #{patient_photo}"
         )
       end
     end

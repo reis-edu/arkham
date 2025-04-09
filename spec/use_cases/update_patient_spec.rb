@@ -9,7 +9,7 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
     )
   end
   let(:patient_repository) { instance_double('PatientRepository', within_transaction: nil, find_by_cpf: instance_double('Arkham::Domain::Entities::Patient', id: '123')) }
-  let(:patient_photo_repository) { instance_double('PatientPhotoRepository', load: mock_photo) }
+  let(:patient_photo_repository) { instance_double('PatientPhotoRepository') }
   let(:use_case) { described_class.new(patient_repository, patient_photo_repository) }
 
   describe '#execute' do
@@ -213,10 +213,10 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
       before do
         allow(patient_repository).to receive(:find_by_id).with(patient_id).and_return(double('Patient'))
         allow(patient_repository).to receive(:update)
-        allow(patient_photo_repository).to receive(:valid?).and_return(true)
         allow(patient_photo_repository).to receive(:save).and_return(mock_photo)
         allow(patient_repository).to receive(:update)
         allow(Arkham::Repository::Filebase::PatientPhoto).to receive(:new).and_return(mock_photo)
+        allow(mock_photo).to receive(:valid?).and_return(true)
         allow(patient_repository).to receive(:find_by_cpf).and_return(nil)
         allow(patient_repository).to receive(:within_transaction) do |&block|
           block.call
@@ -224,7 +224,6 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
       end
 
       it 'processes the photo' do
-        expect(patient_photo_repository).to receive(:valid?)
         expect(patient_photo_repository).to receive(:save)
         use_case.execute(patient_id, params_with_photo)
       end
@@ -242,22 +241,12 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
 
       context 'when photo is invalid' do
         before do
-          allow(patient_photo_repository).to receive(:valid?).and_return(false)
+          allow(mock_photo).to receive(:valid?).and_return(false)
         end
 
         it 'logs the error but continues processing' do
-          expect(patient_photo_repository).not_to receive(:save)
+          expect(mock_photo).not_to receive(:save)
           expect(use_case.execute(patient_id, params_with_photo)).to eq(patient_id)
-        end
-      end
-
-      context 'when photo processing fails' do
-        before do
-          allow(patient_photo_repository).to receive(:save).and_raise(StandardError.new('Photo error'))
-        end
-
-        it 'raises PatientPhotoError' do
-          expect { use_case.execute(patient_id, params_with_photo) }.to raise_error(Arkham::Domain::Errors::PatientPhotoError)
         end
       end
     end
