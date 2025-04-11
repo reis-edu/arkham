@@ -61,7 +61,7 @@ module Api
     private
 
     def patient_find_params
-      params.except(:format, :action, :controller, :application).permit(:status).to_h
+      params.except(:format, :action, :controller, :application).permit(:status, :search_term).to_h
     end
 
     def permitted_params

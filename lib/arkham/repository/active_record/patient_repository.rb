@@ -9,7 +9,7 @@ module Arkham
         end
 
         def find_all(filter_params = {})
-          patients = ::Patient.where(filter_params).all
+          patients = PatientFilterRepository.new.call(filter_params)
           patients.map { |patient| map_to_entity(patient) }
         end
         
