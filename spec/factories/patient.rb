@@ -3,7 +3,7 @@ FactoryBot.define do
     firstname      { 'Pedra' }
     lastname       { 'Cerode' }
     sus            { '123456784343' }
-    cpf            { '628.506.300-14' }
+    cpf            { CpfUtils.cpf }
     gender         { 'female' }
     rg             { '12.123.123-2' }
     birth_date     { DateTime.new(1928, 10, 15) }
