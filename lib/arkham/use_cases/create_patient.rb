@@ -27,6 +27,7 @@ module Arkham
       def validate_patient_params(params)
         new_patient = Validators::Api::PatientContract.new.call(params)
         if new_patient.errors.any?
+          Rails.logger.error("Validators::Errors::ApiValidationError #{new_patient.errors.to_h}")
           raise Validators::Errors::ApiValidationError.new(new_patient.errors.to_h), 'Patient params are not valid!'
         end
 
