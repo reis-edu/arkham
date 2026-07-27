@@ -11,6 +11,9 @@ RSpec.describe Arkham::UseCases::DestroyPatient do
       before do
         allow(patient_repository).to receive(:find_by_id).with(patient_id).and_return(double('Patient'))
         allow(patient_repository).to receive(:destroy)
+        allow(patient_repository).to receive(:within_transaction) do |&block|
+          block.call
+        end
       end
 
       it 'destroys the patient' do
@@ -33,6 +36,9 @@ RSpec.describe Arkham::UseCases::DestroyPatient do
       before do
         allow(patient_repository).to receive(:find_by_id).with(patient_id).and_return(double('Patient'))
         allow(patient_repository).to receive(:destroy).and_raise(StandardError.new('Database error'))
+        allow(patient_repository).to receive(:within_transaction) do |&block|
+          block.call
+        end
       end
 
       it 'raises StandardError' do
