@@ -16,12 +16,16 @@ module Arkham
       @list_patients_use_case ||= UseCases::ListPatients.new(patient_repository)
     end
 
+    def self.save_patient_photo_use_case
+      @save_patient_photo_use_case ||= UseCases::SavePatientPhoto.new(patient_repository, patient_photo_repository)
+    end
+
     def self.create_patient_use_case
-      @create_patient_use_case ||= UseCases::CreatePatient.new(patient_repository, patient_photo_repository)
+      @create_patient_use_case ||= UseCases::CreatePatient.new(patient_repository, patient_photo_repository, save_patient_photo_use_case)
     end
 
     def self.update_patient_use_case
-      @update_patient_use_case ||= UseCases::UpdatePatient.new(patient_repository, patient_photo_repository)
+      @update_patient_use_case ||= UseCases::UpdatePatient.new(patient_repository, patient_photo_repository, save_patient_photo_use_case)
     end
 
     def self.destroy_patient_use_case

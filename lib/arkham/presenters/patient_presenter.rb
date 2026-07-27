@@ -1,9 +1,9 @@
 module Arkham
   module Presenters
     class PatientPresenter
-      def initialize(patient)
+      def initialize(patient, get_presigned_profile_url_use_case: Arkham::Dependencies.get_presigned_profile_url_use_case)
         @patient = patient
-        @get_presigned_profile_url_use_case = Arkham::Dependencies.get_presigned_profile_url_use_case
+        @get_presigned_profile_url_use_case = get_presigned_profile_url_use_case
       end
 
       def to_json

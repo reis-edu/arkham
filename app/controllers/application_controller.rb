@@ -7,6 +7,10 @@ class ApplicationController < ActionController::Base
     render json: { error: e.message }, status: :unprocessable_entity
   end
 
+  rescue_from Arkham::Domain::Errors::PatientInvalidError do |e|
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
   rescue_from Arkham::Domain::Errors::PatientPhotoError do |e|
     render json: { error: e.message }, status: :unprocessable_entity
   end

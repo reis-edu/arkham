@@ -1,9 +1,9 @@
 module Arkham
   module UseCases
     class UpdatePatient
-      def initialize(patient_repository, patient_photo_repository)
+      def initialize(patient_repository, patient_photo_repository, save_patient_photo = SavePatientPhoto.new(patient_repository, patient_photo_repository))
         @patient_repository = patient_repository
-        @patient_photo_repository = patient_photo_repository
+        @save_patient_photo = save_patient_photo
       end
 
       def execute(patient_id, patient_params)
@@ -16,7 +16,7 @@ module Arkham
           @patient_repository.update(patient_id, validated_params)
 
           if photo_params.present? && photo_params[:photo_base64].present?
-            save_patient_photo(patient_id, photo_params)
+            @save_patient_photo.execute(patient_id, photo_params)
           end
 
           patient_id
@@ -35,7 +35,7 @@ module Arkham
       def validate_patient_params(args)
         patient_params = Validators::Api::PatientContract.new.call(args)
         if patient_params.errors.any?
-          raise Validators::Errors::ApiValidationError.new(patient_params.errors.to_h), 'Patient params are not valid!'
+          raise Validators::Errors::ApiValidationError.new(patient_params.errors.to_h)
         end
 
         patient_params.to_h
@@ -49,26 +49,6 @@ module Arkham
         end
 
         patient
-      end
-
-      def save_patient_photo(patient_id, photo_params)
-        patient_photo = @patient_photo_repository.save(
-          patient_id, 
-          photo_params[:photo_base64],
-          photo_params[:photo_base64_format]
-        )
-
-        update_patient(patient_photo, patient_id)
-      end
-
-      def update_patient(patient_photo, patient_id)
-        @patient_repository.update(
-          patient_id,
-          {
-            photo_url: patient_photo.photo_url,
-            photo_key: patient_photo.photo_key
-          }
-        )
       end
     end
   end

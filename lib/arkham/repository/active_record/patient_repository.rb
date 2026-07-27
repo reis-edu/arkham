@@ -1,7 +1,11 @@
+require_relative '../port'
+
 module Arkham
   module Repository
     module ActiveRecord
       class PatientRepository
+        include Arkham::Repository::Port
+
         def within_transaction(&block)
           ::ActiveRecord::Base.transaction do
             yield if block_given?
@@ -23,12 +27,16 @@ module Arkham
         def create(patient_params)
           patient = ::Patient.create!(patient_params)
           patient.id
+        rescue ::ActiveRecord::RecordInvalid => e
+          raise Domain::Errors::PatientInvalidError, e.record.errors.full_messages.join(', ')
         end
 
         def update(patient_id, update_params)
           patient = ::Patient.find(patient_id)
           patient.update!(update_params)
           patient.id
+        rescue ::ActiveRecord::RecordInvalid => e
+          raise Domain::Errors::PatientInvalidError, e.record.errors.full_messages.join(', ')
         end
 
         def destroy(patient_id)

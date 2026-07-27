@@ -8,7 +8,7 @@ module Arkham
       def execute(patient_id)
         patient = find_patient(patient_id)
 
-        ActiveRecord::Base.transaction do
+        @patient_repository.within_transaction do
           @patient_repository.destroy(patient_id)
         end
       end

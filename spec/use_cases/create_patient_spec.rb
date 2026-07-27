@@ -72,6 +72,13 @@ RSpec.describe Arkham::UseCases::CreatePatient do
         it 'raises ApiValidationError' do
           expect { use_case.execute(empty_params) }.to raise_error(Arkham::Validators::Errors::ApiValidationError)
         end
+
+        it 'preserves the detailed message and field errors on the raised exception' do
+          use_case.execute(empty_params)
+        rescue Arkham::Validators::Errors::ApiValidationError => e
+          expect(e.message).to match(/API validation failed/)
+          expect(e.errors).to include(:firstname, :lastname, :cpf, :gender)
+        end
       end
 
       context 'when params are nil' do
