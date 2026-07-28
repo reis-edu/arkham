@@ -16,5 +16,13 @@ Rails.application.routes.draw do
 
     put '/patients/:id/activate',           to: 'patients#activate'
     put '/patients/:id/inactivate',         to: 'patients#inactivate'
+
+    post '/auth/login',                     to: 'authentication#login'
+    post '/auth/refresh',                   to: 'authentication#refresh'
+
+    resources :users,      only: %i[create]
+
+    put '/users/:id/password',              to: 'users#change_password'
+    put '/users/:id/group',                 to: 'users#change_group'
   end
 end

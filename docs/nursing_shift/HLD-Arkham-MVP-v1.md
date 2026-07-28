@@ -47,8 +47,8 @@ Padrões adotados
 | Componente | Responsabilidades | Dependências |
 | ----------- | ----------------- | ------------ |
 | **Camada HTTP (`/api`)** | Roteamento, **CORS**, limite **global** de taxa (**100 req/min**), serialização **JSON**, mapeamento de erros HTTP | Middleware de auth, casos de uso |
-| **Autenticação e JWT** | Login, emissão e validação de **JWT**, troca de senha conforme PRD; usuário desativado bloqueado | Postgres (credenciais e estado do usuário), segredo de assinatura na Koyeb |
-| **Autorização por perfil** | Garantir **Desenvolvedor**, **ADM** e **Enfermagem** apenas nas rotas permitidas | Claims do JWT, regras por rota |
+| **Autenticação, JWT e refresh token** | Cadastro de usuário (nome, login, senha, e-mail, grupo) por **administrator/maintainer** com senha padrão; login por **login** (não e-mail); emissão de **token de acesso** (JWT curto) e **refresh token** (opaco, rotativo, armazenado com hash); troca de senha; usuário desativado bloqueado | Postgres (usuários, refresh tokens), segredo de assinatura na Koyeb |
+| **Grupos de permissão** | Manter os 5 grupos (**maintainer, administrator, nursing_leaders, nursing_team, employer**), matriz de permissão testável no código; impedir alteração de grupo que zere **administrator/maintainer** ativos; **v1/M1 sem bloqueio de rota por grupo** (ver PRD FR-002) | Claims do JWT, regras por rota (fase futura) |
 | **Domínio plantão e checklist** | Materializar o que se aplica ao plantão, **salvamento contínuo**, finalização de execução e revisão, divergência e impossível cumprir conforme PRD | Postgres, auditoria, opcionalmente cliente WhatsApp |
 | **Cadastros ADM** | Usuários, itens, atividades com **periodicidade** e atribuições | Postgres, auditoria |
 | **Listagem e consulta de plantões** | Relatórios e detalhes com **visibilidade por perfil** | Postgres |
@@ -81,7 +81,8 @@ Padrões adotados
 ### Modelo de dados (alto nível)
 
 Entidades principais
-- **Usuário** e vínculo com **perfil**
+- **Usuário** (nome, login, senha, e-mail, grupo, ativo) e vínculo com **grupo de permissão**
+- **Refresh token** (usuário, hash do token, expiração, revogado em)
 - **Item** de checklist (catálogo)
 - **Atividade** com **periodicidade** e **atribuição** (plantão ou usuário)
 - **Plantão**
@@ -130,10 +131,16 @@ Meta de disponibilidade
 ### Segurança
 
 Autenticação
-- **E-mail** e **senha**; **JWT** nas rotas protegidas; **sem MFA** na v1 (**PRD**)
+- **Login** (padrão `nome.sobrenome`, não e-mail) e **senha**; cadastro com **senha padrão** trocada posteriormente pelo usuário; **token de acesso** (JWT curto) e **refresh token** (opaco, rotativo, revogável) nas rotas protegidas; **sem MFA** na v1 (**PRD**)
 
 Autorização
-- **RBAC** por **perfil** (**Desenvolvedor**, **ADM**, **Enfermagem**) com checagem por **endpoint** ou mecanismo central equivalente
+- Modelo de **5 grupos** (**maintainer, administrator, nursing_leaders, nursing_team, employer**) com matriz de permissão versionada no código
+- **M1 (fase atual):** a maioria das rotas autenticadas valida apenas **usuário existe**, **está ativo** e **token de acesso válido** — **sem** bloqueio por grupo (checagem completa por **endpoint** é fase futura, ver PRD FR-002)
+- **Exceção já implementada — regras de propriedade de dados:**
+  - Troca de senha: **próprio usuário** ou **administrator/maintainer** podem trocar a senha de um usuário; qualquer outro ator recebe `403`
+  - Troca de grupo: **apenas administrator/maintainer** (nunca "self" se não privilegiado, para impedir auto-escalonamento de privilégio); qualquer outro ator recebe `403`
+  - **Login é imutável** em qualquer endpoint pós-criação (nenhum contract de update aceita o campo `login`)
+- Alteração de grupo de usuário é bloqueada se resultar em **zero** usuários **administrator/maintainer** ativos
 
 Proteção de dados
 - **HTTPS** obrigatório em produção (**PRD**)
@@ -142,7 +149,8 @@ Proteção de dados
 
 Gestão de segredos
 - **Secrets** e variáveis protegidas na **Koyeb** (JWT, Postgres, **OTLP/Grafana**, credenciais **WhatsApp**)
-- **JWT** **sem** revogação imediata no servidor; controle por **expiração** e procedimentos em **incidente** no **FDD** (**TTL**, rotação de chave)
+- **Token de acesso (JWT)** de curta duração, **sem** revogação imediata no servidor dentro do seu próprio TTL
+- **Refresh token** é **revogável**: armazenado com hash no Postgres, **rotativo** (cada uso emite um novo par e invalida o anterior), com expiração própria (mais longa que o token de acesso)
 
 ---
 
@@ -211,7 +219,7 @@ Dashboards e alertas
 ### ADRs e próximos passos
 
 ADRs associados
-- **Não há ADRs** escritos; **sugestão de ADRs a criar:** JWT sem revogação na v1; Postgres único na Koyeb; processamento síncrono sem fila; backend em **Ruby on Rails**; deploy na **Koyeb**; observabilidade **OTel + Grafana Cloud**; prefixo **`/api`** sem versão no path; **rate limit global**; **auditoria na mesma transação**; retenção **5 anos** com arquivamento
+- **Não há ADRs** escritos; **sugestão de ADRs a criar:** token de acesso (JWT) sem revogação + refresh token opaco rotativo revogável; login por **login** (`nome.sobrenome`) em vez de e-mail; modelo de **5 grupos** com matriz de permissão em código (sem tabela de configuração); M1 sem bloqueio de rota por grupo; Postgres único na Koyeb; processamento síncrono sem fila; backend em **Ruby on Rails**; deploy na **Koyeb**; observabilidade **OTel + Grafana Cloud**; prefixo **`/api`** sem versão no path; **rate limit global**; **auditoria na mesma transação**; retenção **5 anos** com arquivamento
 
 Decisões pendentes
 - Ajustes finos de **camada de dados** (Active Record) e organização de gems em **Ruby on Rails** (**FDD**)

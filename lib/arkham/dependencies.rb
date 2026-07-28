@@ -43,5 +43,37 @@ module Arkham
     def self.get_presigned_profile_url_use_case
       @get_presigned_profile_url_use_case ||= UseCases::GetPresignedProfileUrl.new(patient_photo_repository)
     end
+
+    def self.user_repository
+      @user_repository ||= Repository::ActiveRecord::UserRepository.new
+    end
+
+    def self.refresh_token_repository
+      @refresh_token_repository ||= Repository::ActiveRecord::RefreshTokenRepository.new
+    end
+
+    def self.issue_token_pair_use_case
+      @issue_token_pair_use_case ||= UseCases::IssueTokenPair.new(refresh_token_repository)
+    end
+
+    def self.create_user_use_case
+      @create_user_use_case ||= UseCases::CreateUser.new(user_repository)
+    end
+
+    def self.login_use_case
+      @login_use_case ||= UseCases::Login.new(user_repository, issue_token_pair_use_case)
+    end
+
+    def self.refresh_access_token_use_case
+      @refresh_access_token_use_case ||= UseCases::RefreshAccessToken.new(user_repository, refresh_token_repository, issue_token_pair_use_case)
+    end
+
+    def self.change_password_use_case
+      @change_password_use_case ||= UseCases::ChangePassword.new(user_repository)
+    end
+
+    def self.change_user_group_use_case
+      @change_user_group_use_case ||= UseCases::ChangeUserGroup.new(user_repository)
+    end
   end
 end
