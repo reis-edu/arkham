@@ -55,9 +55,9 @@ class ApplicationController < ActionController::Base
       @current_user = User.find(@decoded[:user_id])
       render json: { error: 'User is inactive' }, status: :forbidden unless @current_user.active?
     rescue ActiveRecord::RecordNotFound => e
-      render json: { errors: e.message }, status: :forbidden
+      render json: { errors: e.message }, status: :unauthorized
     rescue JWT::DecodeError => e
-      render json: { errors: e.message }, status: :forbidden
+      render json: { errors: e.message }, status: :unauthorized
     end
   end
 

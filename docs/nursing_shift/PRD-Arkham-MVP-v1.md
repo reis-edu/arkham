@@ -136,11 +136,13 @@ Permitir acesso ao sistema com **login** (não e-mail) e senha, com usuários ca
 Garantir que cada usuário pertença a um dos 5 grupos definidos (`maintainer`, `administrator`, `nursing_leaders`, `nursing_team`, `employer` — ver "Grupos de permissão e hierarquia"), que a alteração de grupo de um usuário nunca deixe o sistema sem nenhum usuário ativo `administrator` ou `maintainer`, e que cada usuário só edite seus próprios dados (salvo exceções abaixo).
 
 **Regras de propriedade de dados (implementadas)**
+- **Listagem de usuários:** **somente** `administrator`/`maintainer` pode listar os demais usuários do sistema
 - **Criação de usuário:** **somente** `administrator`/`maintainer` pode criar um novo usuário
 - **Troca de senha:** o próprio usuário pode trocar sua senha; `administrator`/`maintainer` também podem trocar a senha de qualquer outro usuário. Nenhum outro grupo pode alterar a senha de terceiros
 - **Troca de grupo:** **somente** `administrator`/`maintainer` pode alterar o grupo de um usuário — inclusive o próprio. Um usuário fora desses grupos **não pode** alterar nem mesmo o próprio grupo (evita auto-promoção/escalonamento de privilégio)
 - **Login é imutável:** nenhum endpoint permite alterar o `login` de um usuário existente, nem o próprio usuário, nem `administrator`/`maintainer`. O `login` só é definido na criação do usuário
-- **Exclusão/inativação de usuário:** funcionalidade **ainda não implementada** no MVP; quando existir, fica restrita a `administrator`/`maintainer`
+- **Exclusão de usuário:** **somente** `administrator`/`maintainer` pode excluir um usuário; **ninguém pode excluir a própria conta**, nem mesmo um `administrator`/`maintainer` (exige outro usuário privilegiado para executar a ação)
+- **Inativação de usuário:** mesmas regras da exclusão (**somente** `administrator`/`maintainer`, **não pode** ser a própria conta); diferente da exclusão, o registro é preservado (só marcado como inativo) e não há endpoint de reativação no MVP
 
 **Bootstrap do primeiro usuário**
 Como criar um usuário agora exige um ator `administrator`/`maintainer` já existente, o sistema precisa nascer com pelo menos um. Isso é garantido por uma **migração de banco** (não um seed manual) que cria um usuário `maintainer` padrão (login `admin.sistema`, senha padrão do sistema) na primeira vez que roda em qualquer ambiente. Por ser uma migração comum, ela roda **uma única vez**: se esse usuário for posteriormente removido/inativado seguindo as regras normais, a migração não o recria automaticamente (não há "auto-cura"). Existe também um `db/seeds.rb` equivalente para fluxos que reconstroem o banco via `db:schema:load` + `db:seed` (esse caminho não reexecuta migrações antigas).

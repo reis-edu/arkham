@@ -12,6 +12,10 @@ module Arkham
           end
         end
 
+        def find_all(_filter_params = {})
+          ::User.order(:name).map { |user| map_to_entity(user) }
+        end
+
         def find_by_id(user_id)
           user = ::User.find_by(id: user_id)
           return nil unless user
@@ -47,6 +51,18 @@ module Arkham
           user.id
         rescue ::ActiveRecord::RecordInvalid => e
           raise Domain::Errors::UserInvalidError, e.record.errors.full_messages.join(', ')
+        end
+
+        def destroy(user_id)
+          user = ::User.find(user_id)
+          user.destroy
+          user.id
+        end
+
+        def inactivate(user_id)
+          user = ::User.find(user_id)
+          user.update!(active: false)
+          user.id
         end
 
         def authenticate(login, password)

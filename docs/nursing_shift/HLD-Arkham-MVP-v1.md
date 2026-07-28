@@ -132,16 +132,19 @@ Meta de disponibilidade
 
 Autenticação
 - **Login** (padrão `nome.sobrenome`, não e-mail) e **senha**; cadastro com **senha padrão** trocada posteriormente pelo usuário; **token de acesso** (JWT curto) e **refresh token** (opaco, rotativo, revogável) nas rotas protegidas; **sem MFA** na v1 (**PRD**)
+- **Convenção de status HTTP:** token ausente, inválido, expirado ou de usuário que não existe mais → **`401 Unauthorized`** (sinal para o cliente tentar `POST /api/auth/refresh`); usuário existente porém **inativo**, ou violação de regra de grupo/propriedade → **`403 Forbidden`** (refresh não resolve, é preciso reativação ou permissão diferente)
 
 Autorização
 - Modelo de **5 grupos** (**maintainer, administrator, nursing_leaders, nursing_team, employer**) com matriz de permissão versionada no código
 - **M1 (implementado) — regras de propriedade de dados nos endpoints de usuário:**
+  - Listagem de usuários: **apenas administrator/maintainer**; qualquer outro ator recebe `403`
   - Criação de usuário: **apenas administrator/maintainer**; qualquer outro ator recebe `403`
   - Troca de senha: **próprio usuário** ou **administrator/maintainer** podem trocar a senha de um usuário; qualquer outro ator recebe `403`
   - Troca de grupo: **apenas administrator/maintainer** (nunca "self" se não privilegiado, para impedir auto-escalonamento de privilégio); qualquer outro ator recebe `403`
+  - Exclusão e inativação de usuário: **apenas administrator/maintainer**, e **nunca contra a própria conta** (guarda `forbid_self_target`, distinta da checagem de grupo); qualquer violação recebe `403`
   - **Login é imutável** em qualquer endpoint pós-criação (nenhum contract de update aceita o campo `login`)
 - **Bootstrap:** uma migração de banco (`CreateDefaultMaintainerUser`) cria um usuário `maintainer` padrão (login `admin.sistema`) no primeiro deploy, garantindo que sempre exista alguém apto a criar os demais usuários; roda uma única vez (semântica padrão de migração Rails) — se o usuário for removido depois, não é recriado automaticamente. Há também um `db/seeds.rb` equivalente para o caminho `db:schema:load` + `db:seed`, que não reexecuta migrações antigas
-- Alteração de grupo de usuário é bloqueada se resultar em **zero** usuários **administrator/maintainer** ativos
+- Alteração, exclusão ou inativação de usuário é bloqueada se resultar em **zero** usuários **administrator/maintainer** ativos — regra centralizada em `Arkham::UseCases::EnsurePrivilegedGroupRemains`, reaproveitada pelos três use cases (`ChangeUserGroup`, `DestroyUser`, `InactivateUser`). Para exclusão/inativação essa checagem é defesa em profundidade: como quem executa a ação já precisa ser `administrator`/`maintainer` diferente do alvo (guarda `forbid_self_target`), o cenário de "zerar" não é alcançável via API hoje — só via `ChangeUserGroup`, onde um privilegiado pode rebaixar a si mesmo
 - **M1 (fase futura):** as rotas de plantão/checklist (fora do escopo de M1) ainda não existem; quando existirem, aplicarão a matriz de permissão completa por grupo (ver PRD FR-002)
 
 Proteção de dados

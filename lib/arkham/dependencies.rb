@@ -56,6 +56,10 @@ module Arkham
       @issue_token_pair_use_case ||= UseCases::IssueTokenPair.new(refresh_token_repository)
     end
 
+    def self.list_users_use_case
+      @list_users_use_case ||= UseCases::ListUsers.new(user_repository)
+    end
+
     def self.create_user_use_case
       @create_user_use_case ||= UseCases::CreateUser.new(user_repository)
     end
@@ -74,6 +78,14 @@ module Arkham
 
     def self.change_user_group_use_case
       @change_user_group_use_case ||= UseCases::ChangeUserGroup.new(user_repository)
+    end
+
+    def self.destroy_user_use_case
+      @destroy_user_use_case ||= UseCases::DestroyUser.new(user_repository)
+    end
+
+    def self.inactivate_user_use_case
+      @inactivate_user_use_case ||= UseCases::InactivateUser.new(user_repository)
     end
   end
 end

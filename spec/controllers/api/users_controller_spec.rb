@@ -13,7 +13,15 @@ RSpec.describe Api::UsersController, type: :controller do
   describe 'authorize_user_request guard (existence, active status and token validity)' do
     it 'rejects requests without a token' do
       post :create, params: { user: valid_user_params }, format: :json
-      expect(response).to have_http_status(:forbidden)
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'rejects an expired or malformed token' do
+      expired_token = JsonWebToken.encode({ user_id: SecureRandom.uuid, group: 'administrator' }, 1.hour.ago)
+      request.headers['Authorization'] = "Bearer #{expired_token}"
+
+      post :create, params: { user: valid_user_params }, format: :json
+      expect(response).to have_http_status(:unauthorized)
     end
 
     it 'rejects a token for a user that no longer exists' do
@@ -21,7 +29,7 @@ RSpec.describe Api::UsersController, type: :controller do
       request.headers['Authorization'] = "Bearer #{JsonWebToken.encode(user_id: ghost_id, group: 'administrator')}"
 
       post :create, params: { user: valid_user_params }, format: :json
-      expect(response).to have_http_status(:forbidden)
+      expect(response).to have_http_status(:unauthorized)
     end
 
     it 'rejects a token for an inactive user' do
@@ -30,6 +38,35 @@ RSpec.describe Api::UsersController, type: :controller do
 
       post :create, params: { user: valid_user_params }, format: :json
       expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  describe 'GET #index' do
+    context 'when the actor is administrator/maintainer' do
+      let(:actor) { create(:user, :administrator) }
+
+      before { auth_header_for(actor) }
+
+      it 'returns all users' do
+        other_user = create(:user, group: 'employer')
+
+        get :index, format: :json
+
+        expect(response).to have_http_status(:ok)
+        returned_ids = JSON.parse(response.body)['users'].map { |user| user['id'] }
+        expect(returned_ids).to contain_exactly(actor.id, other_user.id)
+      end
+    end
+
+    context 'when the actor is not administrator/maintainer' do
+      let(:actor) { create(:user, group: 'employer') }
+
+      before { auth_header_for(actor) }
+
+      it 'returns forbidden' do
+        get :index, format: :json
+        expect(response).to have_http_status(:forbidden)
+      end
     end
   end
 
@@ -173,6 +210,127 @@ RSpec.describe Api::UsersController, type: :controller do
 
         expect(response).to have_http_status(:forbidden)
         expect(other_user.reload.group).to eq('nursing_team')
+      end
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    context 'when the actor is administrator/maintainer targeting someone else' do
+      let(:actor) { create(:user, :administrator) }
+
+      before { auth_header_for(actor) }
+
+      it 'destroys the user' do
+        other_user = create(:user, group: 'employer')
+
+        delete :destroy, params: { id: other_user.id }, format: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(User.exists?(other_user.id)).to eq(false)
+      end
+
+      # The "last administrator/maintainer" safety net (tested directly in
+      # destroy_user_spec.rb) can't actually trigger through this endpoint:
+      # the actor must itself be an active administrator/maintainer distinct
+      # from the target (forbid_self_target), so at least the actor always
+      # remains after the target is removed.
+      it 'still allows destroying another privileged user, since the acting administrator/maintainer remains' do
+        other_admin = create(:user, :maintainer)
+
+        delete :destroy, params: { id: other_admin.id }, format: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(User.exists?(other_admin.id)).to eq(false)
+      end
+    end
+
+    context 'when the actor targets its own account' do
+      let(:actor) { create(:user, :administrator) }
+
+      before { auth_header_for(actor) }
+
+      it 'returns forbidden and does not destroy the actor' do
+        create(:user, :maintainer)
+
+        delete :destroy, params: { id: actor.id }, format: :json
+
+        expect(response).to have_http_status(:forbidden)
+        expect(User.exists?(actor.id)).to eq(true)
+      end
+    end
+
+    context 'when the actor is not administrator/maintainer' do
+      let(:actor) { create(:user, group: 'employer') }
+
+      before { auth_header_for(actor) }
+
+      it 'returns forbidden and does not destroy the target' do
+        other_user = create(:user, group: 'nursing_team')
+
+        delete :destroy, params: { id: other_user.id }, format: :json
+
+        expect(response).to have_http_status(:forbidden)
+        expect(User.exists?(other_user.id)).to eq(true)
+      end
+    end
+  end
+
+  describe 'PUT #inactivate' do
+    context 'when the actor is administrator/maintainer targeting someone else' do
+      let(:actor) { create(:user, :administrator) }
+
+      before { auth_header_for(actor) }
+
+      it 'inactivates the user' do
+        other_user = create(:user, group: 'employer', active: true)
+
+        put :inactivate, params: { id: other_user.id }, format: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(other_user.reload.active?).to eq(false)
+      end
+
+      # See the equivalent note in the DELETE #destroy spec above: this
+      # safety net can't actually trigger through the endpoint, since the
+      # acting administrator/maintainer always remains after the target
+      # (someone else) is inactivated.
+      it 'still allows inactivating another privileged user, since the acting administrator/maintainer remains' do
+        other_admin = create(:user, :maintainer)
+
+        put :inactivate, params: { id: other_admin.id }, format: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(other_admin.reload.active?).to eq(false)
+      end
+    end
+
+    context 'when the actor targets its own account' do
+      let(:actor) { create(:user, :administrator) }
+
+      before { auth_header_for(actor) }
+
+      it 'returns forbidden and does not inactivate the actor' do
+        create(:user, :maintainer)
+
+        put :inactivate, params: { id: actor.id }, format: :json
+
+        expect(response).to have_http_status(:forbidden)
+        expect(actor.reload.active?).to eq(true)
+      end
+    end
+
+    context 'when the actor is not administrator/maintainer' do
+      let(:actor) { create(:user, group: 'employer') }
+
+      before { auth_header_for(actor) }
+
+      it 'returns forbidden and does not inactivate the target' do
+        other_user = create(:user, group: 'nursing_team', active: true)
+
+        put :inactivate, params: { id: other_user.id }, format: :json
+
+        expect(response).to have_http_status(:forbidden)
+        expect(other_user.reload.active?).to eq(true)
       end
     end
   end

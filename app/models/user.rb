@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   GROUPS = %w[maintainer administrator nursing_leaders nursing_team employer].freeze
+  PRIVILEGED_GROUPS = %w[administrator maintainer].freeze
   LOGIN_FORMAT = /\A[a-z0-9]+(\.[a-z0-9]+)+\z/
 
   has_secure_password

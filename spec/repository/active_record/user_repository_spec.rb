@@ -15,6 +15,21 @@ RSpec.describe Arkham::Repository::ActiveRecord::UserRepository do
     end
   end
 
+  describe '#find_all' do
+    it 'returns all users ordered by name' do
+      create(:user, name: 'Zeca', login: 'zeca.silva')
+      create(:user, name: 'Ana', login: 'ana.silva')
+
+      entities = repository.find_all
+
+      expect(entities.map(&:name)).to eq(%w[Ana Zeca])
+    end
+
+    it 'returns an empty array when there are no users' do
+      expect(repository.find_all).to eq([])
+    end
+  end
+
   describe '#find_by_login' do
     let!(:user) { create(:user, login: 'joao.silva') }
 
@@ -75,6 +90,32 @@ RSpec.describe Arkham::Repository::ActiveRecord::UserRepository do
     it 'updates the group' do
       repository.update_group(user.id, 'nursing_leaders')
       expect(user.reload.group).to eq('nursing_leaders')
+    end
+  end
+
+  describe '#destroy' do
+    let!(:user) { create(:user) }
+
+    it 'removes the user record' do
+      repository.destroy(user.id)
+      expect(User.exists?(user.id)).to eq(false)
+    end
+
+    it 'also removes the user refresh tokens (dependent: :destroy)' do
+      create(:refresh_token_record, user: user)
+
+      repository.destroy(user.id)
+
+      expect(RefreshToken.where(user_id: user.id)).to be_empty
+    end
+  end
+
+  describe '#inactivate' do
+    let!(:user) { create(:user, active: true) }
+
+    it 'sets the user as inactive' do
+      repository.inactivate(user.id)
+      expect(user.reload.active?).to eq(false)
     end
   end
 
