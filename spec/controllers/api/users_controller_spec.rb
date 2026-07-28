@@ -10,7 +10,7 @@ RSpec.describe Api::UsersController, type: :controller do
     { name: 'Maria Souza', login: 'maria.souza', email: 'maria@example.com', group: 'nursing_team' }
   end
 
-  describe 'authorization guard (M1: existence, active status and token validity only)' do
+  describe 'authorize_user_request guard (existence, active status and token validity)' do
     it 'rejects requests without a token' do
       post :create, params: { user: valid_user_params }, format: :json
       expect(response).to have_http_status(:forbidden)
@@ -31,43 +31,50 @@ RSpec.describe Api::UsersController, type: :controller do
       post :create, params: { user: valid_user_params }, format: :json
       expect(response).to have_http_status(:forbidden)
     end
-
-    it 'accepts any active user regardless of group (no route restriction yet)' do
-      basic_user = create(:user, group: 'employer')
-      auth_header_for(basic_user)
-
-      post :create, params: { user: valid_user_params }, format: :json
-      expect(response).to have_http_status(:ok)
-    end
   end
 
   describe 'POST #create' do
-    let(:actor) { create(:user, :administrator) }
+    context 'when the actor is administrator/maintainer' do
+      let(:actor) { create(:user, :administrator) }
 
-    before { auth_header_for(actor) }
+      before { auth_header_for(actor) }
 
-    it 'creates the user with the default password and returns its id' do
-      post :create, params: { user: valid_user_params }, format: :json
+      it 'creates the user with the default password and returns its id' do
+        post :create, params: { user: valid_user_params }, format: :json
 
-      expect(response).to have_http_status(:ok)
-      created_id = JSON.parse(response.body)['id']
+        expect(response).to have_http_status(:ok)
+        created_id = JSON.parse(response.body)['id']
 
-      created_user = User.find(created_id)
-      expect(created_user.login).to eq('maria.souza')
-      expect(created_user.must_change_password).to eq(true)
-      expect(created_user.authenticate(Arkham.config[:users][:default_password])).to be_truthy
+        created_user = User.find(created_id)
+        expect(created_user.login).to eq('maria.souza')
+        expect(created_user.must_change_password).to eq(true)
+        expect(created_user.authenticate(Arkham.config[:users][:default_password])).to be_truthy
+      end
+
+      it 'returns unprocessable_entity when the login already exists' do
+        create(:user, login: 'maria.souza')
+
+        post :create, params: { user: valid_user_params }, format: :json
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it 'returns unprocessable_entity when required fields are missing' do
+        post :create, params: { user: { name: 'Maria' } }, format: :json
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
     end
 
-    it 'returns unprocessable_entity when the login already exists' do
-      create(:user, login: 'maria.souza')
+    context 'when the actor is not administrator/maintainer' do
+      let(:actor) { create(:user, group: 'employer') }
 
-      post :create, params: { user: valid_user_params }, format: :json
-      expect(response).to have_http_status(:unprocessable_entity)
-    end
+      before { auth_header_for(actor) }
 
-    it 'returns unprocessable_entity when required fields are missing' do
-      post :create, params: { user: { name: 'Maria' } }, format: :json
-      expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns forbidden and does not create the user' do
+        post :create, params: { user: valid_user_params }, format: :json
+
+        expect(response).to have_http_status(:forbidden)
+        expect(User.exists?(login: 'maria.souza')).to eq(false)
+      end
     end
   end
 

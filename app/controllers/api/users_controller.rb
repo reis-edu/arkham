@@ -4,7 +4,7 @@ module Api
 
     before_action :authorize_user_request
     before_action :authorize_self_or_privileged, only: %i[change_password]
-    before_action :authorize_privileged, only: %i[change_group]
+    before_action :authorize_privileged, only: %i[create change_group]
 
     def initialize(repositories = {})
       @create_user_use_case = Arkham::Dependencies.create_user_use_case

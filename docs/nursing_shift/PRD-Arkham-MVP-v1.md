@@ -126,7 +126,7 @@ Permitir acesso ao sistema com **login** (não e-mail) e senha, com usuários ca
 - Usuário desativado
 - Refresh token inválido, expirado ou já utilizado
 
-**Nota de fase (M1):** login e cadastro **não têm** restrição de acesso por grupo nas rotas ainda — ver FR-002, "Fase atual de implementação".
+**Nota de fase (M1):** o cadastro de usuário **exige** que quem chama seja `administrator`/`maintainer` (ver FR-002). Para garantir que sempre exista pelo menos um usuário apto a criar outros, o sistema cria um usuário `maintainer` padrão via migração no primeiro deploy (ver FR-002, "Bootstrap do primeiro usuário").
 
 **Prioridade:** alta
 
@@ -136,20 +136,23 @@ Permitir acesso ao sistema com **login** (não e-mail) e senha, com usuários ca
 Garantir que cada usuário pertença a um dos 5 grupos definidos (`maintainer`, `administrator`, `nursing_leaders`, `nursing_team`, `employer` — ver "Grupos de permissão e hierarquia"), que a alteração de grupo de um usuário nunca deixe o sistema sem nenhum usuário ativo `administrator` ou `maintainer`, e que cada usuário só edite seus próprios dados (salvo exceções abaixo).
 
 **Regras de propriedade de dados (implementadas)**
+- **Criação de usuário:** **somente** `administrator`/`maintainer` pode criar um novo usuário
 - **Troca de senha:** o próprio usuário pode trocar sua senha; `administrator`/`maintainer` também podem trocar a senha de qualquer outro usuário. Nenhum outro grupo pode alterar a senha de terceiros
 - **Troca de grupo:** **somente** `administrator`/`maintainer` pode alterar o grupo de um usuário — inclusive o próprio. Um usuário fora desses grupos **não pode** alterar nem mesmo o próprio grupo (evita auto-promoção/escalonamento de privilégio)
 - **Login é imutável:** nenhum endpoint permite alterar o `login` de um usuário existente, nem o próprio usuário, nem `administrator`/`maintainer`. O `login` só é definido na criação do usuário
 - **Exclusão/inativação de usuário:** funcionalidade **ainda não implementada** no MVP; quando existir, fica restrita a `administrator`/`maintainer`
 
+**Bootstrap do primeiro usuário**
+Como criar um usuário agora exige um ator `administrator`/`maintainer` já existente, o sistema precisa nascer com pelo menos um. Isso é garantido por uma **migração de banco** (não um seed manual) que cria um usuário `maintainer` padrão (login `admin.sistema`, senha padrão do sistema) na primeira vez que roda em qualquer ambiente. Por ser uma migração comum, ela roda **uma única vez**: se esse usuário for posteriormente removido/inativado seguindo as regras normais, a migração não o recria automaticamente (não há "auto-cura"). Existe também um `db/seeds.rb` equivalente para fluxos que reconstroem o banco via `db:schema:load` + `db:seed` (esse caminho não reexecuta migrações antigas).
+
 **Fluxo principal**
-- `administrator` ou `maintainer` altera o grupo de um usuário existente (inclusive o próprio)
-- Antes de aplicar, o sistema verifica se restará pelo menos um usuário `administrator` ou `maintainer` ativo; caso contrário, a alteração é bloqueada
+- `administrator` ou `maintainer` cria um novo usuário ou altera o grupo de um usuário existente (inclusive o próprio)
+- Antes de aplicar uma troca de grupo, o sistema verifica se restará pelo menos um usuário `administrator` ou `maintainer` ativo; caso contrário, a alteração é bloqueada
 - Qualquer usuário troca a própria senha; `administrator`/`maintainer` podem trocar a senha de qualquer usuário
 
 **Fase atual de implementação (M1)**
-- As regras de propriedade de dados acima **já estão aplicadas** nas rotas de troca de senha e troca de grupo
-- As demais rotas (ex.: criação de usuário) **ainda não têm** bloqueio de rota por grupo/permissão: validam apenas que o usuário existe, está ativo e que o token de acesso é válido
-- A tabela completa de "o que cada grupo pode fazer" (ver "Grupos de permissão e hierarquia") fica registrada e testável no código como matriz de permissão; a aplicação desse bloqueio nas demais rotas é uma fase futura do roadmap (ver [ROADMAP-v1.md](ROADMAP-v1.md))
+- As regras de propriedade de dados acima **já estão aplicadas** nas rotas de criação de usuário, troca de senha e troca de grupo
+- A tabela completa de "o que cada grupo pode fazer" (ver "Grupos de permissão e hierarquia") vai além dessas 3 regras — cobre também as futuras rotas de plantão/checklist (fora do escopo de M1); essa parte mais ampla da matriz continua como fase futura do roadmap (ver [ROADMAP-v1.md](ROADMAP-v1.md))
 
 **Fluxos alternativos e exceções**
 - Tentativa de alteração de grupo que zeraria os usuários `administrator`/`maintainer` ativos é bloqueada com erro

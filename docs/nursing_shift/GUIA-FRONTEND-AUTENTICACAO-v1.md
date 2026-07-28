@@ -6,9 +6,7 @@ Referência: [PRD-Arkham-MVP-v1.md](PRD-Arkham-MVP-v1.md) (FR-001, FR-002), [ROA
 
 Este documento descreve os endpoints implementados no marco M1: login, refresh de token, criação de usuário, troca de senha e troca de grupo. Todos os endpoints estão sob o prefixo `/api` e trocam JSON.
 
-**Importante (fase atual):** `POST /api/users` (criar usuário) só valida que o token de acesso é válido, que o usuário existe e está ativo — **não há** checagem de grupo/permissão nessa rota ainda (qualquer usuário autenticado ativo pode chamá-la hoje). O frontend deve esconder essa ação da UI conforme o grupo do usuário logado, já que o backend ainda não bloqueia no nível de rota para ela.
-
-`PUT /api/users/:id/password` e `PUT /api/users/:id/group` **já têm** checagem de propriedade/grupo — ver detalhes em cada seção abaixo.
+**Importante:** os três endpoints de gestão de usuário (`POST /api/users`, `PUT /api/users/:id/password`, `PUT /api/users/:id/group`) já têm checagem de propriedade/grupo — ver detalhes em cada seção abaixo. O frontend deve esconder essas ações da UI conforme o grupo do usuário logado, mas isso é só uma melhoria de UX — o backend já bloqueia de verdade.
 
 ---
 
@@ -97,7 +95,9 @@ Mesmo formato do login (novo `access_token`, novo `refresh_token`, `must_change_
 
 ### POST /api/users — criar usuário
 
-Requer `Authorization: Bearer <access_token>` de um usuário ativo (fase atual: qualquer usuário ativo, ver nota no topo). A senha inicial é sempre a senha padrão do sistema — não é enviada no payload nem escolhida pelo frontend.
+Requer `Authorization: Bearer <access_token>` de um usuário `administrator`/`maintainer` — qualquer outro grupo recebe `403`. A senha inicial é sempre a senha padrão do sistema — não é enviada no payload nem escolhida pelo frontend.
+
+**Bootstrap:** o sistema garante, via migração, que sempre existe pelo menos um usuário `maintainer` (login `admin.sistema`) desde o primeiro deploy, para que sempre haja alguém apto a chamar este endpoint.
 
 **Request**
 ```json
@@ -127,8 +127,13 @@ Campos:
 **Erros**
 | Status | Situação |
 | --- | --- |
-| `403 Forbidden` | token ausente/inválido, ou usuário do token inativo |
+| `403 Forbidden` | token ausente/inválido, usuário do token inativo, **ou** quem chama não é `administrator`/`maintainer` |
 | `422 Unprocessable Entity` | `login` já existe, campo obrigatório ausente, `login` fora do padrão, ou `group` inválido |
+
+Mensagem de erro do caso de propriedade:
+```json
+{ "error": "Only administrator or maintainer can perform this action" }
+```
 
 ---
 

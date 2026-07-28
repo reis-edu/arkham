@@ -135,12 +135,14 @@ Autenticação
 
 Autorização
 - Modelo de **5 grupos** (**maintainer, administrator, nursing_leaders, nursing_team, employer**) com matriz de permissão versionada no código
-- **M1 (fase atual):** a maioria das rotas autenticadas valida apenas **usuário existe**, **está ativo** e **token de acesso válido** — **sem** bloqueio por grupo (checagem completa por **endpoint** é fase futura, ver PRD FR-002)
-- **Exceção já implementada — regras de propriedade de dados:**
+- **M1 (implementado) — regras de propriedade de dados nos endpoints de usuário:**
+  - Criação de usuário: **apenas administrator/maintainer**; qualquer outro ator recebe `403`
   - Troca de senha: **próprio usuário** ou **administrator/maintainer** podem trocar a senha de um usuário; qualquer outro ator recebe `403`
   - Troca de grupo: **apenas administrator/maintainer** (nunca "self" se não privilegiado, para impedir auto-escalonamento de privilégio); qualquer outro ator recebe `403`
   - **Login é imutável** em qualquer endpoint pós-criação (nenhum contract de update aceita o campo `login`)
+- **Bootstrap:** uma migração de banco (`CreateDefaultMaintainerUser`) cria um usuário `maintainer` padrão (login `admin.sistema`) no primeiro deploy, garantindo que sempre exista alguém apto a criar os demais usuários; roda uma única vez (semântica padrão de migração Rails) — se o usuário for removido depois, não é recriado automaticamente. Há também um `db/seeds.rb` equivalente para o caminho `db:schema:load` + `db:seed`, que não reexecuta migrações antigas
 - Alteração de grupo de usuário é bloqueada se resultar em **zero** usuários **administrator/maintainer** ativos
+- **M1 (fase futura):** as rotas de plantão/checklist (fora do escopo de M1) ainda não existem; quando existirem, aplicarão a matriz de permissão completa por grupo (ver PRD FR-002)
 
 Proteção de dados
 - **HTTPS** obrigatório em produção (**PRD**)

@@ -38,8 +38,10 @@ Escopo confirmado com o time (2026-07-27):
 - Senha padrão e TTLs de token ficam em `config/arkham.yml` (`users.default_password`, `users.access_token_expiration`, `users.refresh_token_expiration`).
 - Especificações de controller neste projeto **não conseguem** mockar `Arkham::Dependencies` a partir do `before`/`it` do exemplo — o `rspec-rails` instancia `@controller` (e portanto chama `initialize`) antes desses hooks rodarem. Os specs de `patients_controller` já seguiam esse padrão (rodam contra a implementação real); os novos specs de `users_controller`/`authentication_controller` fazem o mesmo — banco real via FactoryBot, sem mocks de Dependencies.
 
+**Refinamento pós-fechamento do marco (2026-07-27):** as regras de propriedade de dados foram estendidas a `POST /api/users` — agora exige `administrator`/`maintainer`, igual a `PUT /api/users/:id/group`. Isso fechou a última rota de gestão de usuário sem checagem de grupo. Para viabilizar isso sem deixar o sistema sem ninguém apto a criar usuários, foi adicionada a migração `db/migrate/20260727130000_create_default_maintainer_user.rb`, que cria um `maintainer` padrão (login `admin.sistema`) no primeiro deploy — roda uma única vez (semântica padrão de migração), não recria o usuário se ele for removido depois. Existe também `db/seeds.rb` equivalente para o caminho `db:setup`/`db:schema:load` + `db:seed`, que não reexecuta migrações antigas.
+
 **Tarefas futuras identificadas (não fazem parte deste marco):**
-- [ ] Aplicar de fato o bloqueio de rota por grupo (guarda de autorização), consumindo a matriz de permissões já documentada no PRD
+- [ ] Aplicar o bloqueio de rota por grupo nas futuras rotas de plantão/checklist (fora do escopo de usuários/M1), consumindo a matriz de permissões já documentada no PRD
 - [ ] Decidir se/como será feito rate limiting e alertas sobre tentativas de login inválidas repetidas (força bruta) — fora do escopo original deste marco
 
 ---
