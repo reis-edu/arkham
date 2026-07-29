@@ -11,6 +11,10 @@ defaults: &defaults
     presigned_url_expiration: 3600
   visits:
     duration: 20
+  users:
+    default_password: 'Arkham@2026'
+    access_token_expiration: 900
+    refresh_token_expiration: 2592000
 
 development:
   <<: *defaults

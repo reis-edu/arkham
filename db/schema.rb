@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_11_230442) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_27_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -51,6 +51,30 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_11_230442) do
     t.string "status", default: "active"
   end
 
+  create_table "refresh_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "token_digest", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["token_digest"], name: "index_refresh_tokens_on_token_digest", unique: true
+    t.index ["user_id"], name: "index_refresh_tokens_on_user_id"
+  end
+
+  create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.string "login", null: false
+    t.string "email", null: false
+    t.string "password_digest", null: false
+    t.string "group", null: false
+    t.boolean "active", default: true, null: false
+    t.boolean "must_change_password", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["login"], name: "index_users_on_login", unique: true
+  end
+
   create_table "visitors", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
@@ -85,4 +109,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_11_230442) do
     t.string "diuresis"
     t.string "feces"
   end
+
+  add_foreign_key "refresh_tokens", "users"
 end
