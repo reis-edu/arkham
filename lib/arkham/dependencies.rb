@@ -87,5 +87,85 @@ module Arkham
     def self.inactivate_user_use_case
       @inactivate_user_use_case ||= UseCases::InactivateUser.new(user_repository)
     end
+
+    def self.shift_item_repository
+      @shift_item_repository ||= Repository::ActiveRecord::ShiftItemRepository.new
+    end
+
+    def self.shift_repository
+      @shift_repository ||= Repository::ActiveRecord::ShiftRepository.new
+    end
+
+    def self.shift_item_check_repository
+      @shift_item_check_repository ||= Repository::ActiveRecord::ShiftItemCheckRepository.new
+    end
+
+    def self.list_shift_items_use_case
+      @list_shift_items_use_case ||= UseCases::ListShiftItems.new(shift_item_repository)
+    end
+
+    def self.show_shift_item_use_case
+      @show_shift_item_use_case ||= UseCases::ShowShiftItem.new(shift_item_repository)
+    end
+
+    def self.create_shift_item_use_case
+      @create_shift_item_use_case ||= UseCases::CreateShiftItem.new(shift_item_repository)
+    end
+
+    def self.update_shift_item_use_case
+      @update_shift_item_use_case ||= UseCases::UpdateShiftItem.new(shift_item_repository)
+    end
+
+    def self.destroy_shift_item_use_case
+      @destroy_shift_item_use_case ||= UseCases::DestroyShiftItem.new(shift_item_repository)
+    end
+
+    def self.list_shift_item_checks_use_case
+      @list_shift_item_checks_use_case ||= UseCases::ListShiftItemChecks.new(shift_item_check_repository)
+    end
+
+    def self.list_shifts_use_case
+      @list_shifts_use_case ||= UseCases::ListShifts.new(shift_repository)
+    end
+
+    def self.show_shift_use_case
+      @show_shift_use_case ||= UseCases::ShowShift.new(shift_repository, shift_item_check_repository, list_shift_item_checks_use_case)
+    end
+
+    def self.show_current_shift_use_case
+      @show_current_shift_use_case ||= UseCases::ShowCurrentShift.new(shift_repository, shift_item_check_repository, list_shift_item_checks_use_case)
+    end
+
+    def self.create_shift_use_case
+      @create_shift_use_case ||= UseCases::CreateShift.new(shift_repository, shift_item_repository, shift_item_check_repository)
+    end
+
+    def self.update_shift_use_case
+      @update_shift_use_case ||= UseCases::UpdateShift.new(shift_repository)
+    end
+
+    def self.destroy_shift_use_case
+      @destroy_shift_use_case ||= UseCases::DestroyShift.new(shift_repository)
+    end
+
+    def self.check_shift_item_use_case
+      @check_shift_item_use_case ||= UseCases::CheckShiftItem.new(shift_item_check_repository, shift_repository)
+    end
+
+    def self.review_shift_item_use_case
+      @review_shift_item_use_case ||= UseCases::ReviewShiftItem.new(shift_item_check_repository, shift_repository)
+    end
+
+    def self.finalize_shift_execution_use_case
+      @finalize_shift_execution_use_case ||= UseCases::FinalizeShiftExecution.new(shift_repository)
+    end
+
+    def self.finalize_shift_review_use_case
+      @finalize_shift_review_use_case ||= UseCases::FinalizeShiftReview.new(shift_repository)
+    end
+
+    def self.list_shift_divergences_use_case
+      @list_shift_divergences_use_case ||= UseCases::ListShiftDivergences.new(shift_item_check_repository, shift_repository)
+    end
   end
 end

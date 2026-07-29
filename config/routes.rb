@@ -25,5 +25,16 @@ Rails.application.routes.draw do
     put '/users/:id/password',              to: 'users#change_password'
     put '/users/:id/group',                 to: 'users#change_group'
     put '/users/:id/inactivate',            to: 'users#inactivate'
+
+    resources :shift_items, only: %i[index show create update destroy]
+
+    get  '/shifts/current',                 to: 'shifts#current'
+    resources :shifts,      only: %i[index show create update destroy]
+    put  '/shifts/:id/finalize_execution',  to: 'shifts#finalize_execution'
+    put  '/shifts/:id/finalize_review',     to: 'shifts#finalize_review'
+    get  '/shifts/:id/divergences',         to: 'shifts#divergences'
+
+    put  '/shifts/:shift_id/items/:shift_item_id/check',  to: 'shift_item_checks#check'
+    put  '/shifts/:shift_id/items/:shift_item_id/review', to: 'shift_item_checks#review'
   end
 end

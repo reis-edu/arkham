@@ -47,6 +47,60 @@ class ApplicationController < ActionController::Base
     render json: { error: e.message }, status: :unprocessable_entity
   end
 
+  rescue_from Arkham::Domain::Errors::ShiftItemNotFoundError do |e|
+    render json: { error: e.message }, status: :not_found
+  end
+
+  rescue_from Arkham::Domain::Errors::ShiftItemAlreadyExistsError do |e|
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  rescue_from Arkham::Domain::Errors::ShiftItemInvalidError do |e|
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  rescue_from Arkham::Domain::Errors::ShiftItemInUseError do |e|
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  rescue_from Arkham::Domain::Errors::ShiftNotFoundError do |e|
+    render json: { error: e.message }, status: :not_found
+  end
+
+  rescue_from Arkham::Domain::Errors::ShiftAlreadyExistsError do |e|
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  rescue_from Arkham::Domain::Errors::ShiftInvalidError do |e|
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  rescue_from Arkham::Domain::Errors::ShiftItemCheckNotFoundError do |e|
+    render json: { error: e.message }, status: :not_found
+  end
+
+  rescue_from Arkham::Domain::Errors::ShiftItemCheckInvalidError do |e|
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  rescue_from Arkham::Domain::Errors::ShiftAlreadyFinalizedError do |e|
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  rescue_from Arkham::Domain::Errors::ShiftNotReadyForReviewError do |e|
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  rescue_from Arkham::Domain::Errors::ShiftEditForbiddenError do |e|
+    render json: { error: e.message }, status: :forbidden
+  end
+
+  def authorize_group!(*groups, message: 'You are not allowed to perform this action')
+    return if groups.flatten.include?(@current_user.group)
+
+    render json: { error: message }, status: :forbidden
+  end
+
   def authorize_user_request
     header = request.headers['Authorization']
     header = header.split(' ').last if header
