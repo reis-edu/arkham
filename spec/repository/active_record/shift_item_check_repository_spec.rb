@@ -24,6 +24,38 @@ RSpec.describe Arkham::Repository::ActiveRecord::ShiftItemCheckRepository do
     end
   end
 
+  describe '#create' do
+    it 'creates a single pending check for the shift/item pair' do
+      shift = create(:shift)
+      shift_item = create(:shift_item)
+
+      id = repository.create(shift.id, shift_item.id)
+
+      check = ShiftItemCheck.find(id)
+      expect(check.shift_id).to eq(shift.id)
+      expect(check.shift_item_id).to eq(shift_item.id)
+      expect(check.checked?).to eq(false)
+      expect(check.review_status).to eq('pending')
+    end
+
+    it 'raises ShiftItemCheckInvalidError when the pair already exists (unique index)' do
+      existing = create(:shift_item_check)
+
+      expect { repository.create(existing.shift_id, existing.shift_item_id) }
+        .to raise_error(Arkham::Domain::Errors::ShiftItemCheckInvalidError)
+    end
+  end
+
+  describe '#destroy' do
+    it 'removes the check' do
+      check = create(:shift_item_check)
+
+      repository.destroy(check.id)
+
+      expect(ShiftItemCheck.exists?(check.id)).to eq(false)
+    end
+  end
+
   describe '#find_by_id' do
     it 'returns the matching entity with the shift item name/description' do
       shift_item = create(:shift_item, name: 'Aferir pressão', description: 'Checar PA')
@@ -34,6 +66,28 @@ RSpec.describe Arkham::Repository::ActiveRecord::ShiftItemCheckRepository do
       expect(entity.id).to eq(check.id)
       expect(entity.shift_item_name).to eq('Aferir pressão')
       expect(entity.shift_item_description).to eq('Checar PA')
+    end
+
+    it 'returns the checked_by/reviewed_by name and login when present' do
+      checker = create(:user, name: 'Ana Souza', login: 'ana.souza')
+      reviewer = create(:user, name: 'Bruno Lima', login: 'bruno.lima')
+      check = create(:shift_item_check, :checked, checked_by: checker, reviewed_by: reviewer)
+
+      entity = repository.find_by_id(check.id)
+
+      expect(entity.checked_by_name).to eq('Ana Souza')
+      expect(entity.checked_by_login).to eq('ana.souza')
+      expect(entity.reviewed_by_name).to eq('Bruno Lima')
+      expect(entity.reviewed_by_login).to eq('bruno.lima')
+    end
+
+    it 'returns nil name/login when checked_by/reviewed_by are absent' do
+      check = create(:shift_item_check)
+
+      entity = repository.find_by_id(check.id)
+
+      expect(entity.checked_by_name).to be_nil
+      expect(entity.reviewed_by_name).to be_nil
     end
 
     it 'returns nil when there is no match' do

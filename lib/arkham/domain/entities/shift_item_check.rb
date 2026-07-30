@@ -3,9 +3,10 @@ module Arkham
     module Entities
       class ShiftItemCheck
         attr_reader :id, :shift_id, :shift_item_id, :shift_item_name, :shift_item_description,
-                    :checked, :checked_by_id, :checked_at,
+                    :checked, :checked_by_id, :checked_by_name, :checked_by_login, :checked_at,
                     :impossible, :impossible_reason,
-                    :review_status, :reviewed_by_id, :reviewed_at, :divergence_note
+                    :review_status, :reviewed_by_id, :reviewed_by_name, :reviewed_by_login,
+                    :reviewed_at, :divergence_note
 
         def initialize(attributes = {})
           @id = attributes[:id]
@@ -15,11 +16,15 @@ module Arkham
           @shift_item_description = attributes[:shift_item_description]
           @checked = attributes[:checked]
           @checked_by_id = attributes[:checked_by_id]
+          @checked_by_name = attributes[:checked_by_name]
+          @checked_by_login = attributes[:checked_by_login]
           @checked_at = attributes[:checked_at]
           @impossible = attributes[:impossible]
           @impossible_reason = attributes[:impossible_reason]
           @review_status = attributes[:review_status] || 'pending'
           @reviewed_by_id = attributes[:reviewed_by_id]
+          @reviewed_by_name = attributes[:reviewed_by_name]
+          @reviewed_by_login = attributes[:reviewed_by_login]
           @reviewed_at = attributes[:reviewed_at]
           @divergence_note = attributes[:divergence_note]
         end

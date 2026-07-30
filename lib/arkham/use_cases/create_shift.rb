@@ -9,12 +9,13 @@ module Arkham
 
       def execute(params)
         validated = validate_params(params)
+        item_ids = validated[:shift_item_ids].uniq
         check_duplicate(validated[:shift_date], validated[:shift_type])
+        check_items_exist(item_ids)
 
         @shift_repository.within_transaction do
-          shift_id = @shift_repository.create(validated)
-          active_item_ids = @shift_item_repository.find_all_active.map(&:id)
-          @shift_item_check_repository.snapshot_for_shift(shift_id, active_item_ids)
+          shift_id = @shift_repository.create(shift_date: validated[:shift_date], shift_type: validated[:shift_type])
+          @shift_item_check_repository.snapshot_for_shift(shift_id, item_ids)
           shift_id
         end
       end
@@ -33,6 +34,12 @@ module Arkham
         return unless existing
 
         raise Domain::Errors::ShiftAlreadyExistsError, 'Shift already exists for this date and type!'
+      end
+
+      def check_items_exist(item_ids)
+        return if @shift_item_repository.all_exist?(item_ids)
+
+        raise Domain::Errors::ShiftItemNotFoundError, 'One or more shift items do not exist'
       end
     end
   end

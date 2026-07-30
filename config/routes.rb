@@ -29,10 +29,14 @@ Rails.application.routes.draw do
     resources :shift_items, only: %i[index show create update destroy]
 
     get  '/shifts/current',                 to: 'shifts#current'
+    post '/shifts/copy_last',               to: 'shifts#copy_last'
     resources :shifts,      only: %i[index show create update destroy]
     put  '/shifts/:id/finalize_execution',  to: 'shifts#finalize_execution'
     put  '/shifts/:id/finalize_review',     to: 'shifts#finalize_review'
     get  '/shifts/:id/divergences',         to: 'shifts#divergences'
+
+    post   '/shifts/:shift_id/items',                       to: 'shifts#add_item'
+    delete '/shifts/:shift_id/items/:shift_item_id',        to: 'shifts#remove_item'
 
     put  '/shifts/:shift_id/items/:shift_item_id/check',  to: 'shift_item_checks#check'
     put  '/shifts/:shift_id/items/:shift_item_id/review', to: 'shift_item_checks#review'

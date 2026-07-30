@@ -83,8 +83,16 @@ class ApplicationController < ActionController::Base
     render json: { error: e.message }, status: :unprocessable_entity
   end
 
+  rescue_from Arkham::Domain::Errors::ShiftItemCheckAlreadyExistsError do |e|
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
   rescue_from Arkham::Domain::Errors::ShiftAlreadyFinalizedError do |e|
     render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  rescue_from Arkham::Domain::Errors::ShiftCopySourceNotFoundError do |e|
+    render json: { error: e.message }, status: :not_found
   end
 
   rescue_from Arkham::Domain::Errors::ShiftNotReadyForReviewError do |e|

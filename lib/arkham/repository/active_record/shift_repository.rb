@@ -38,6 +38,13 @@ module Arkham
           map_to_entity(shift)
         end
 
+        def find_last_by_type(shift_type)
+          shift = ::Shift.where(shift_type: shift_type).order(shift_date: :desc, created_at: :desc).first
+          return nil unless shift
+
+          map_to_entity(shift)
+        end
+
         def create(params)
           shift = ::Shift.create!(params)
           shift.id

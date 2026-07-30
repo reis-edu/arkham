@@ -50,6 +50,22 @@ RSpec.describe Arkham::Repository::ActiveRecord::ShiftRepository do
     end
   end
 
+  describe '#find_last_by_type' do
+    it 'returns the most recent shift of the given type' do
+      create(:shift, shift_date: Date.new(2026, 1, 1), shift_type: 'noturno')
+      most_recent = create(:shift, shift_date: Date.new(2026, 2, 1), shift_type: 'noturno')
+      create(:shift, shift_date: Date.new(2026, 3, 1), shift_type: 'diurno')
+
+      expect(repository.find_last_by_type('noturno').id).to eq(most_recent.id)
+    end
+
+    it 'returns nil when there is no shift of that type' do
+      create(:shift, shift_date: Date.new(2026, 1, 1), shift_type: 'diurno')
+
+      expect(repository.find_last_by_type('noturno')).to be_nil
+    end
+  end
+
   describe '#find_current' do
     it 'returns the most recent shift that is not review_finalized' do
       create(:shift, :review_finalized, shift_date: Date.new(2026, 5, 1))

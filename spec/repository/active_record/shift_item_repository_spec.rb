@@ -97,4 +97,25 @@ RSpec.describe Arkham::Repository::ActiveRecord::ShiftItemRepository do
       expect(repository.used_in_any_shift?(shift_item.id)).to eq(false)
     end
   end
+
+  describe '#all_exist?' do
+    it 'returns true when every given id exists' do
+      item_one = create(:shift_item)
+      item_two = create(:shift_item)
+
+      expect(repository.all_exist?([item_one.id, item_two.id])).to eq(true)
+    end
+
+    it 'returns false when at least one id does not exist' do
+      item_one = create(:shift_item)
+
+      expect(repository.all_exist?([item_one.id, SecureRandom.uuid])).to eq(false)
+    end
+
+    it 'tolerates duplicate ids in the input' do
+      item_one = create(:shift_item)
+
+      expect(repository.all_exist?([item_one.id, item_one.id])).to eq(true)
+    end
+  end
 end

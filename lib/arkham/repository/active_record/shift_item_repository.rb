@@ -61,6 +61,11 @@ module Arkham
           ::ShiftItemCheck.exists?(shift_item_id: id)
         end
 
+        def all_exist?(ids)
+          ids = ids.uniq
+          ::ShiftItem.where(id: ids).count == ids.size
+        end
+
         private
 
         def map_to_entity(shift_item)

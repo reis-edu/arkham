@@ -39,6 +39,21 @@ RSpec.describe Api::ShiftsController, type: :controller do
           expect(body['id']).to eq(shift.id)
           expect(body['items'].first['id']).to eq(check.id)
         end
+
+        it 'includes the checked_by/reviewed_by name and login in each item' do
+          checker = create(:user, name: 'Ana Souza', login: 'ana.souza')
+          reviewer = create(:user, name: 'Bruno Lima', login: 'bruno.lima')
+          shift = create(:shift)
+          create(:shift_item_check, :checked, shift: shift, checked_by: checker, reviewed_by: reviewer)
+
+          get :show, params: { id: shift.id }, format: :json
+
+          item = JSON.parse(response.body)['items'].first
+          expect(item['checked_by_name']).to eq('Ana Souza')
+          expect(item['checked_by_login']).to eq('ana.souza')
+          expect(item['reviewed_by_name']).to eq('Bruno Lima')
+          expect(item['reviewed_by_login']).to eq('bruno.lima')
+        end
       end
 
       describe 'GET #current' do
@@ -123,21 +138,57 @@ RSpec.describe Api::ShiftsController, type: :controller do
 
         before { auth_header_for(actor) }
 
-        it 'creates a shift and materializes checks for active items' do
-          create(:shift_item, active: true)
+        it 'creates a shift and materializes checks for exactly the chosen items' do
+          chosen = create(:shift_item)
+          create(:shift_item) # not selected, should not be snapshotted
 
-          post :create, params: { shift: { shift_date: '2026-08-01', shift_type: 'diurno' } }, format: :json
+          post :create, params: {
+            shift: { shift_date: '2026-08-01', shift_type: 'diurno', shift_item_ids: [chosen.id] }
+          }, as: :json
 
           expect(response).to have_http_status(:ok)
           shift_id = JSON.parse(response.body)['id']
-          expect(ShiftItemCheck.where(shift_id: shift_id).count).to eq(1)
+          expect(ShiftItemCheck.where(shift_id: shift_id).pluck(:shift_item_id)).to eq([chosen.id])
+        end
+
+        it 'returns unprocessable_entity when no shift_item_ids are given' do
+          post :create, params: { shift: { shift_date: '2026-08-01', shift_type: 'diurno' } }, format: :json
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'returns not_found when a given shift_item_id does not exist' do
+          post :create, params: {
+            shift: { shift_date: '2026-08-01', shift_type: 'diurno', shift_item_ids: [SecureRandom.uuid] }
+          }, as: :json
+
+          expect(response).to have_http_status(:not_found)
         end
 
         it 'returns unprocessable_entity for a duplicate date/type' do
           create(:shift, shift_date: Date.new(2026, 8, 1), shift_type: 'diurno')
+          item = create(:shift_item)
 
-          post :create, params: { shift: { shift_date: '2026-08-01', shift_type: 'diurno' } }, format: :json
+          post :create, params: {
+            shift: { shift_date: '2026-08-01', shift_type: 'diurno', shift_item_ids: [item.id] }
+          }, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'copies the items from the last shift of the same type' do
+          previous = create(:shift, shift_date: Date.new(2026, 7, 1), shift_type: 'noturno')
+          item = create(:shift_item)
+          create(:shift_item_check, shift: previous, shift_item: item)
+
+          post :copy_last, params: { shift: { shift_date: '2026-08-02', shift_type: 'noturno' } }, format: :json
+
+          expect(response).to have_http_status(:ok)
+          shift_id = JSON.parse(response.body)['id']
+          expect(ShiftItemCheck.where(shift_id: shift_id).pluck(:shift_item_id)).to eq([item.id])
+        end
+
+        it 'returns not_found when copying and there is no previous shift of that type' do
+          post :copy_last, params: { shift: { shift_date: '2026-08-02', shift_type: 'noturno' } }, format: :json
+          expect(response).to have_http_status(:not_found)
         end
 
         it 'destroys a shift' do
@@ -158,6 +209,48 @@ RSpec.describe Api::ShiftsController, type: :controller do
           ids = JSON.parse(response.body)['divergences'].map { |d| d['id'] }
           expect(ids).to eq([divergent.id])
         end
+
+        it 'adds an item to an open shift' do
+          shift = create(:shift)
+          shift_item = create(:shift_item)
+
+          post :add_item, params: { shift_id: shift.id, shift_item_id: shift_item.id }, format: :json
+
+          expect(response).to have_http_status(:ok)
+          expect(ShiftItemCheck.exists?(shift_id: shift.id, shift_item_id: shift_item.id)).to eq(true)
+        end
+
+        it 'returns unprocessable_entity when adding an item already in the shift' do
+          check = create(:shift_item_check)
+
+          post :add_item, params: { shift_id: check.shift_id, shift_item_id: check.shift_item_id }, format: :json
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'returns unprocessable_entity when adding an item to a finalized shift' do
+          shift = create(:shift, :execution_finalized)
+          shift_item = create(:shift_item)
+
+          post :add_item, params: { shift_id: shift.id, shift_item_id: shift_item.id }, format: :json
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'removes an item from an open shift' do
+          check = create(:shift_item_check)
+
+          delete :remove_item, params: { shift_id: check.shift_id, shift_item_id: check.shift_item_id }, format: :json
+
+          expect(response).to have_http_status(:ok)
+          expect(ShiftItemCheck.exists?(check.id)).to eq(false)
+        end
+
+        it 'returns unprocessable_entity when removing an item from a finalized shift' do
+          shift = create(:shift, :execution_finalized)
+          check = create(:shift_item_check, shift: shift)
+
+          delete :remove_item, params: { shift_id: check.shift_id, shift_item_id: check.shift_item_id }, format: :json
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
       end
     end
 
@@ -174,6 +267,26 @@ RSpec.describe Api::ShiftsController, type: :controller do
       it 'forbids viewing divergences' do
         shift = create(:shift)
         get :divergences, params: { id: shift.id }, format: :json
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'forbids copying the last shift' do
+        post :copy_last, params: { shift: { shift_date: '2026-08-02', shift_type: 'noturno' } }, format: :json
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'forbids adding an item to a shift' do
+        shift = create(:shift)
+        shift_item = create(:shift_item)
+
+        post :add_item, params: { shift_id: shift.id, shift_item_id: shift_item.id }, format: :json
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'forbids removing an item from a shift' do
+        check = create(:shift_item_check)
+
+        delete :remove_item, params: { shift_id: check.shift_id, shift_item_id: check.shift_item_id }, format: :json
         expect(response).to have_http_status(:forbidden)
       end
     end

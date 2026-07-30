@@ -140,6 +140,10 @@ module Arkham
       @create_shift_use_case ||= UseCases::CreateShift.new(shift_repository, shift_item_repository, shift_item_check_repository)
     end
 
+    def self.copy_last_shift_use_case
+      @copy_last_shift_use_case ||= UseCases::CopyLastShift.new(shift_repository, shift_item_repository, shift_item_check_repository)
+    end
+
     def self.update_shift_use_case
       @update_shift_use_case ||= UseCases::UpdateShift.new(shift_repository)
     end
@@ -166,6 +170,14 @@ module Arkham
 
     def self.list_shift_divergences_use_case
       @list_shift_divergences_use_case ||= UseCases::ListShiftDivergences.new(shift_item_check_repository, shift_repository)
+    end
+
+    def self.add_shift_item_use_case
+      @add_shift_item_use_case ||= UseCases::AddShiftItem.new(shift_repository, shift_item_repository, shift_item_check_repository)
+    end
+
+    def self.remove_shift_item_use_case
+      @remove_shift_item_use_case ||= UseCases::RemoveShiftItem.new(shift_repository, shift_item_check_repository)
     end
   end
 end
