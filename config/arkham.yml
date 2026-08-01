@@ -1,9 +1,9 @@
 defaults: &defaults
   filebase:
     region: 'us-east-1'
-    access_key_id: 'CB12B660B4840748F012'
-    secret_access_key: 'GYftNHJUqopVTObB9JxjxTh3GDd7UKiPS2bEcZqw'
-    endpoint: 'https://s3.filebase.com'
+    access_key_id: '4378AA121BEC517D4061'
+    secret_access_key: 'DozLu2NTvrUfz2NWcJ8b6Xnow3SGNgqMUsu9vrDu'
+    endpoint: 'https://s3.filebase.io'
     patient_path: patients
     bucket: 'arkham'
     force_path_style: true
@@ -26,9 +26,9 @@ production:
   <<: *defaults
   filebase:
     region: 'us-east-1'
-    access_key_id: 'CB12B660B4840748F012'
-    secret_access_key: 'GYftNHJUqopVTObB9JxjxTh3GDd7UKiPS2bEcZqw'
-    endpoint: 'https://s3.filebase.com'
+    access_key_id: '4378AA121BEC517D4061'
+    secret_access_key: 'DozLu2NTvrUfz2NWcJ8b6Xnow3SGNgqMUsu9vrDu'
+    endpoint: 'https://s3.filebase.io'
     patient_path: patients
     bucket: 'arkham'
     force_path_style: true
