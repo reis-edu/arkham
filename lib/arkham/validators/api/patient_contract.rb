@@ -13,6 +13,7 @@ module Arkham
           optional(:rg).maybe(:str?)
           optional(:admission_date).maybe(:str?)
           optional(:birth_date).maybe(:str?)
+          optional(:remove_photo).maybe(:bool?)
           optional(:photo).hash do
             optional(:photo_base64).maybe(:str?)
             optional(:photo_base64_format).maybe(:str?)

@@ -32,6 +32,14 @@ module Arkham
           raise Domain::Errors::PatientPhotoError.new("Error on save patient photo! Error: #{e}")
         end
 
+        def delete(photo_key)
+          return unless photo_key.present?
+
+          @s3_resource.bucket(Arkham.config[:filebase][:bucket]).object(photo_key).delete
+        rescue StandardError => e
+          raise Domain::Errors::PatientPhotoError.new("Error on delete patient photo! Error: #{e}")
+        end
+
         def get_presigned_profile_url(patient_photo_key)
           Rails.cache.fetch("presigned_url:#{patient_photo_key}", expires_in: Arkham.config[:filebase][:presigned_url_expiration]) do
             Rails.logger.info("[S3 Presigned URL] Cache miss for key: #{patient_photo_key}. Generating new URL.")

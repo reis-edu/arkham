@@ -257,5 +257,36 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
         end
       end
     end
+
+    context 'when remove_photo is true' do
+      let(:params_with_remove_photo) { valid_params.merge(remove_photo: true) }
+      let(:patient_double) { double('Patient', photo_key: 'mock-photo-key') }
+
+      before do
+        allow(patient_repository).to receive(:find_by_id).with(patient_id).and_return(patient_double)
+        allow(patient_repository).to receive(:update)
+        allow(patient_repository).to receive(:find_by_cpf).and_return(nil)
+        allow(patient_photo_repository).to receive(:delete)
+        allow(patient_repository).to receive(:within_transaction) do |&block|
+          block.call
+        end
+      end
+
+      it 'deletes the photo from storage' do
+        expect(patient_photo_repository).to receive(:delete).with('mock-photo-key')
+        use_case.execute(patient_id, params_with_remove_photo)
+      end
+
+      it 'clears photo_url and photo_key on the patient' do
+        expect(patient_repository).to receive(:update).with(patient_id, expected_params)
+        expect(patient_repository).to receive(:update).with(patient_id, photo_url: nil, photo_key: nil)
+        use_case.execute(patient_id, params_with_remove_photo)
+      end
+
+      it 'does not attempt to save a new photo' do
+        expect(patient_photo_repository).not_to receive(:save)
+        use_case.execute(patient_id, params_with_remove_photo)
+      end
+    end
   end
 end
