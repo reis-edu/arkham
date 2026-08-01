@@ -25,6 +25,8 @@ services:
       ARKHAM_DATABASE_USERNAME: arkham
       ARKHAM_DATABASE_PASSWORD: arkham
       RAILS_MAX_THREADS: 5
+      FILEBASE_ACCESS_KEY_ID: ${FILEBASE_ACCESS_KEY_ID}
+      FILEBASE_SECRET_ACCESS_KEY: ${FILEBASE_SECRET_ACCESS_KEY}
     volumes:
       - .:/arkham
     ports:

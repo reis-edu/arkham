@@ -1,11 +1,11 @@
 defaults: &defaults
   filebase:
     region: 'us-east-1'
-    access_key_id: '4378AA121BEC517D4061'
-    secret_access_key: 'DozLu2NTvrUfz2NWcJ8b6Xnow3SGNgqMUsu9vrDu'
+    access_key_id: <%= ENV['FILEBASE_ACCESS_KEY_ID'].to_json %>
+    secret_access_key: <%= ENV['FILEBASE_SECRET_ACCESS_KEY'].to_json %>
     endpoint: 'https://s3.filebase.io'
     patient_path: patients
-    bucket: 'arkham'
+    bucket: 'arkham-api'
     force_path_style: true
     acl: 'public-read'
     presigned_url_expiration: 3600
@@ -26,8 +26,8 @@ production:
   <<: *defaults
   filebase:
     region: 'us-east-1'
-    access_key_id: '4378AA121BEC517D4061'
-    secret_access_key: 'DozLu2NTvrUfz2NWcJ8b6Xnow3SGNgqMUsu9vrDu'
+    access_key_id: <%= ENV['FILEBASE_ACCESS_KEY_ID'].to_json %>
+    secret_access_key: <%= ENV['FILEBASE_SECRET_ACCESS_KEY'].to_json %>
     endpoint: 'https://s3.filebase.io'
     patient_path: patients
     bucket: 'arkham'
