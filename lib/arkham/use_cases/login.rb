@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 module Arkham
   module UseCases
     class Login
-      def initialize(user_repository, issue_token_pair = IssueTokenPair.new(Repository::ActiveRecord::RefreshTokenRepository.new))
+      def initialize(user_repository,
+                     issue_token_pair = IssueTokenPair.new(Repository::ActiveRecord::RefreshTokenRepository.new))
         @user_repository = user_repository
         @issue_token_pair = issue_token_pair
       end
@@ -20,9 +23,7 @@ module Arkham
 
       def validate_login_params(params)
         result = Validators::Api::LoginContract.new.call(params)
-        if result.errors.any?
-          raise Validators::Errors::ApiValidationError.new(result.errors.to_h)
-        end
+        raise Validators::Errors::ApiValidationError, result.errors.to_h if result.errors.any?
 
         result.to_h
       end

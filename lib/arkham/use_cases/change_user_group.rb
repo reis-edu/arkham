@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 module Arkham
   module UseCases
     class ChangeUserGroup
-      def initialize(user_repository, ensure_privileged_group_remains = EnsurePrivilegedGroupRemains.new(user_repository))
+      def initialize(user_repository,
+                     ensure_privileged_group_remains = EnsurePrivilegedGroupRemains.new(user_repository))
         @user_repository = user_repository
         @ensure_privileged_group_remains = ensure_privileged_group_remains
       end
@@ -23,9 +26,7 @@ module Arkham
 
       def validate_group_params(params)
         result = Validators::Api::ChangeGroupContract.new.call(params)
-        if result.errors.any?
-          raise Validators::Errors::ApiValidationError.new(result.errors.to_h)
-        end
+        raise Validators::Errors::ApiValidationError, result.errors.to_h if result.errors.any?
 
         result.to_h
       end

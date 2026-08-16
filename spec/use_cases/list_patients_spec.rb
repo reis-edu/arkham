@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::ListPatients do
@@ -61,30 +63,30 @@ RSpec.describe Arkham::UseCases::ListPatients do
 
       context 'with active status' do
         let(:filter_params) { { status: 'active' } }
-  
+
         before do
           create(:patient)
           create(:patient, status: 'inactive')
         end
-  
+
         it 'returns patients' do
           patients = use_case.execute(filter_params)
-  
+
           expect(patients.count).to eq 1
         end
       end
 
       context 'with inactive status' do
         let(:filter_params) { { status: 'inactive' } }
-  
+
         before do
           create(:patient)
           create(:patient, firstname: 'Paciente', lastname: 'Inativo', status: 'inactive')
         end
-  
+
         it 'returns patients' do
           patients = use_case.execute(filter_params)
-  
+
           expect(patients.count).to eq 1
           expect(patients.first.fullname).to eq 'Paciente Inativo'
         end
@@ -92,15 +94,15 @@ RSpec.describe Arkham::UseCases::ListPatients do
 
       context 'with search term without accent' do
         let(:filter_params) { { search_term: 'joao' } }
-  
+
         before do
           create(:patient, firstname: 'João', lastname: 'Pessoa')
           create(:patient, firstname: 'Paciente', lastname: 'Inativo', status: 'inactive')
         end
-  
+
         it 'returns patients' do
           patients = use_case.execute(filter_params)
-  
+
           expect(patients.count).to eq 1
           expect(patients.first.fullname).to eq 'João Pessoa'
         end
@@ -108,15 +110,15 @@ RSpec.describe Arkham::UseCases::ListPatients do
 
       context 'with search term with accent' do
         let(:filter_params) { { search_term: 'joão' } }
-  
+
         before do
           create(:patient, firstname: 'Joao', lastname: 'Pessoa')
           create(:patient, firstname: 'Paciente', lastname: 'Inativo', status: 'inactive')
         end
-  
+
         it 'returns patients' do
           patients = use_case.execute(filter_params)
-  
+
           expect(patients.count).to eq 1
           expect(patients.first.fullname).to eq 'Joao Pessoa'
         end
@@ -124,30 +126,30 @@ RSpec.describe Arkham::UseCases::ListPatients do
 
       context 'with empty search term' do
         let(:filter_params) { { search_term: '' } }
-  
+
         before do
           create(:patient, firstname: 'Joao', lastname: 'Pessoa')
           create(:patient, firstname: 'Paciente', lastname: 'Inativo')
         end
-  
+
         it 'returns patients' do
           patients = use_case.execute(filter_params)
-  
+
           expect(patients.count).to eq 2
         end
       end
 
       context 'with not found search term' do
         let(:filter_params) { { search_term: 'Pedro' } }
-  
+
         before do
           create(:patient, firstname: 'Joao', lastname: 'Pessoa')
           create(:patient, firstname: 'Paciente', lastname: 'Inativo')
         end
-  
+
         it 'do not returns patients' do
           patients = use_case.execute(filter_params)
-  
+
           expect(patients.count).to eq 0
         end
       end

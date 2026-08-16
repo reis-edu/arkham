@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 module Arkham
   module UseCases
     class UpdatePatient
-      def initialize(patient_repository, patient_photo_repository, save_patient_photo = SavePatientPhoto.new(patient_repository, patient_photo_repository))
+      def initialize(patient_repository, patient_photo_repository,
+                     save_patient_photo = SavePatientPhoto.new(patient_repository, patient_photo_repository))
         @patient_repository = patient_repository
         @patient_photo_repository = patient_photo_repository
         @save_patient_photo = save_patient_photo
@@ -37,16 +40,14 @@ module Arkham
 
       def check_duplicate_cpf(patient_id, new_cpf)
         existing_patient = @patient_repository.find_by_cpf(new_cpf)
-        if existing_patient && existing_patient.id != patient_id
-          raise Domain::Errors::PatientAlreadyExistsError, 'Patient with this CPF already exists!'
-        end
+        return unless existing_patient && existing_patient.id != patient_id
+
+        raise Domain::Errors::PatientAlreadyExistsError, 'Patient with this CPF already exists!'
       end
 
       def validate_patient_params(args)
         patient_params = Validators::Api::PatientContract.new.call(args)
-        if patient_params.errors.any?
-          raise Validators::Errors::ApiValidationError.new(patient_params.errors.to_h)
-        end
+        raise Validators::Errors::ApiValidationError, patient_params.errors.to_h if patient_params.errors.any?
 
         patient_params.to_h
       end
@@ -54,9 +55,7 @@ module Arkham
       def find_patient(patient_id)
         patient = @patient_repository.find_by_id(patient_id)
 
-        unless patient
-          raise Domain::Errors::PatientNotFoundError, 'Patient not found'
-        end
+        raise Domain::Errors::PatientNotFoundError, 'Patient not found' unless patient
 
         patient
       end

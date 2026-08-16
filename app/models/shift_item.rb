@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShiftItem < ApplicationRecord
   has_many :shift_item_checks, dependent: :restrict_with_exception
 

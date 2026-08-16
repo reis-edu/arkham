@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module Arkham
   module Domain
     module Entities
       class Patient
-        attr_reader :id, :firstname, :lastname, :cpf, :gender, :status, 
+        attr_reader :id, :firstname, :lastname, :cpf, :gender, :status,
                     :birth_date, :photo_url, :photo_key
 
         def initialize(attributes = {})
@@ -23,6 +25,7 @@ module Arkham
 
         def age
           return 0 unless @birth_date
+
           Date.today.year - @birth_date.year
         end
 

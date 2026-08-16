@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 module Arkham
   module UseCases
     class CreatePatient
-      def initialize(patient_repository, patient_photo_repository, save_patient_photo = SavePatientPhoto.new(patient_repository, patient_photo_repository))
+      def initialize(patient_repository, patient_photo_repository,
+                     save_patient_photo = SavePatientPhoto.new(patient_repository, patient_photo_repository))
         @patient_repository = patient_repository
         @save_patient_photo = save_patient_photo
       end
@@ -23,22 +26,22 @@ module Arkham
       end
 
       private
-      
+
       def validate_patient_params(params)
         new_patient = Validators::Api::PatientContract.new.call(params)
         if new_patient.errors.any?
           Rails.logger.error("Validators::Errors::ApiValidationError #{new_patient.errors.to_h}")
-          raise Validators::Errors::ApiValidationError.new(new_patient.errors.to_h)
+          raise Validators::Errors::ApiValidationError, new_patient.errors.to_h
         end
 
         new_patient.to_h
       end
-      
+
       def check_duplicate_cpf(new_cpf)
         existing_patient = @patient_repository.find_by_cpf(new_cpf)
-        if existing_patient
-          raise Domain::Errors::PatientAlreadyExistsError, 'Patient with this CPF already exists!'
-        end
+        return unless existing_patient
+
+        raise Domain::Errors::PatientAlreadyExistsError, 'Patient with this CPF already exists!'
       end
     end
   end

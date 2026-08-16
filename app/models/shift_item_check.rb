@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShiftItemCheck < ApplicationRecord
   REVIEW_STATUSES = %w[pending confirmed divergent].freeze
 

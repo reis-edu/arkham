@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Shift < ApplicationRecord
   TYPES = %w[diurno noturno].freeze
   STATUSES = %w[open execution_finalized review_finalized].freeze

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Validators
     module Api
@@ -23,17 +25,11 @@ module Arkham
         end
 
         rule(:gender) do
-          unless %w[m f].include?(value)
-            key.failure('must be one of: male, female')
-          end
+          key.failure('must be one of: male, female') unless %w[m f].include?(value)
         end
 
         rule(:status) do
-          if value.present?
-            unless %w[active inactive].include?(value)
-              key.failure('must be one of: active, inactive')
-            end
-          end
+          key.failure('must be one of: active, inactive') if value.present? && !%w[active inactive].include?(value)
         end
       end
     end

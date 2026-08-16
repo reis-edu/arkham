@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Presenters
     class PatientPresignedProfileUrlPresenter
@@ -5,7 +7,7 @@ module Arkham
         @presigned_url = presigned_url
       end
 
-      def to_json
+      def to_json(*_args)
         {
           url: @presigned_url
         }

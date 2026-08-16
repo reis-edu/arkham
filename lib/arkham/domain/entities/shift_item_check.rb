@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Domain
     module Entities
@@ -8,6 +10,7 @@ module Arkham
                     :review_status, :reviewed_by_id, :reviewed_by_name, :reviewed_by_login,
                     :reviewed_at, :divergence_note
 
+        # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
         def initialize(attributes = {})
           @id = attributes[:id]
           @shift_id = attributes[:shift_id]
@@ -28,6 +31,7 @@ module Arkham
           @reviewed_at = attributes[:reviewed_at]
           @divergence_note = attributes[:divergence_note]
         end
+        # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
         def checked?
           @checked

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Presenters
     class ShiftDivergenceListPresenter
@@ -5,7 +7,7 @@ module Arkham
         @checks = checks
       end
 
-      def to_json
+      def to_json(*_args)
         {
           divergences: @checks.map do |check|
             {

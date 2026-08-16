@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Validators
     module Api
@@ -10,15 +12,11 @@ module Arkham
         end
 
         rule(:login) do
-          unless value.match?(::User::LOGIN_FORMAT)
-            key.failure('must follow the pattern name.lastname')
-          end
+          key.failure('must follow the pattern name.lastname') unless value.match?(::User::LOGIN_FORMAT)
         end
 
         rule(:group) do
-          unless ::User::GROUPS.include?(value)
-            key.failure("must be one of: #{::User::GROUPS.join(', ')}")
-          end
+          key.failure("must be one of: #{::User::GROUPS.join(', ')}") unless ::User::GROUPS.include?(value)
         end
       end
     end

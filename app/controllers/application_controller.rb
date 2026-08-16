@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/ClassLength
 class ApplicationController < ActionController::Base
   rescue_from Arkham::Domain::Errors::PatientNotFoundError do |e|
     render json: { error: e.message }, status: :not_found
@@ -135,5 +138,5 @@ class ApplicationController < ActionController::Base
       render json: { errors: e.message }, status: :forbidden
     end
   end
-
 end
+# rubocop:enable Metrics/ClassLength

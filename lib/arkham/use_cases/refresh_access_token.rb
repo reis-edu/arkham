@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 module Arkham
   module UseCases
     class RefreshAccessToken
-      def initialize(user_repository, refresh_token_repository, issue_token_pair = IssueTokenPair.new(refresh_token_repository))
+      def initialize(user_repository, refresh_token_repository,
+                     issue_token_pair = IssueTokenPair.new(refresh_token_repository))
         @user_repository = user_repository
         @refresh_token_repository = refresh_token_repository
         @issue_token_pair = issue_token_pair
@@ -13,7 +16,11 @@ module Arkham
 
         stored_token = @refresh_token_repository.find_by_token_digest(token_digest)
         raise Domain::Errors::InvalidRefreshTokenError, 'Invalid refresh token' unless stored_token
-        raise Domain::Errors::InvalidRefreshTokenError, 'Refresh token expired or revoked' unless stored_token.valid_token?
+
+        unless stored_token.valid_token?
+          raise Domain::Errors::InvalidRefreshTokenError,
+                'Refresh token expired or revoked'
+        end
 
         user = @user_repository.find_by_id(stored_token.user_id)
         raise Domain::Errors::UserNotFoundError, 'User not found' unless user
@@ -28,9 +35,7 @@ module Arkham
 
       def validate_refresh_token_params(params)
         result = Validators::Api::RefreshTokenContract.new.call(params)
-        if result.errors.any?
-          raise Validators::Errors::ApiValidationError.new(result.errors.to_h)
-        end
+        raise Validators::Errors::ApiValidationError, result.errors.to_h if result.errors.any?
 
         result.to_h
       end

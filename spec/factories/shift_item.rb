@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :shift_item do
     sequence(:name) { |n| "Item de plantão #{n}" }

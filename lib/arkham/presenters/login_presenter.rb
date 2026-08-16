@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Presenters
     class LoginPresenter
@@ -5,7 +7,7 @@ module Arkham
         @login_result = login_result
       end
 
-      def to_json
+      def to_json(*_args)
         {
           access_token: @login_result[:access_token],
           refresh_token: @login_result[:refresh_token],

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module UseCases
     class FinalizeShiftReview
@@ -29,7 +31,10 @@ module Arkham
                 'Shift execution must be finalized before the review can be finalized'
         end
 
-        raise Domain::Errors::ShiftAlreadyFinalizedError, 'Shift review has already been finalized' if shift.review_finalized?
+        return unless shift.review_finalized?
+
+        raise Domain::Errors::ShiftAlreadyFinalizedError,
+              'Shift review has already been finalized'
       end
     end
   end

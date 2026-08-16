@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module UseCases
     class RemoveShiftItem
@@ -28,7 +30,8 @@ module Arkham
       def guard_open!(shift)
         return if shift.open?
 
-        raise Domain::Errors::ShiftAlreadyFinalizedError, 'Shift items can only be added or removed while the shift is open'
+        raise Domain::Errors::ShiftAlreadyFinalizedError,
+              'Shift items can only be added or removed while the shift is open'
       end
 
       def find_check(shift_id, shift_item_id)

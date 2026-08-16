@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 module Arkham
   module UseCases
     class CopyLastShift
       def initialize(shift_repository, shift_item_repository, shift_item_check_repository,
-                     create_shift = CreateShift.new(shift_repository, shift_item_repository, shift_item_check_repository))
+                     create_shift = CreateShift.new(shift_repository, shift_item_repository,
+                                                    shift_item_check_repository))
         @shift_repository = shift_repository
         @shift_item_check_repository = shift_item_check_repository
         @create_shift = create_shift
@@ -24,7 +27,7 @@ module Arkham
 
       def validate_params(params)
         result = Validators::Api::CopyLastShiftContract.new.call(params)
-        raise Validators::Errors::ApiValidationError.new(result.errors.to_h) if result.errors.any?
+        raise Validators::Errors::ApiValidationError, result.errors.to_h if result.errors.any?
 
         result.to_h
       end

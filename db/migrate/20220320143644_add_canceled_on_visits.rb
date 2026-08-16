@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddCanceledOnVisits < ActiveRecord::Migration[7.0]
   def change
     add_column :visits, :canceled, :boolean, default: false

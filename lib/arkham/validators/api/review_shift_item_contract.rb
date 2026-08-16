@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Validators
     module Api
@@ -8,9 +10,7 @@ module Arkham
         end
 
         rule(:review_status) do
-          unless %w[confirmed divergent].include?(value)
-            key.failure('must be one of: confirmed, divergent')
-          end
+          key.failure('must be one of: confirmed, divergent') unless %w[confirmed divergent].include?(value)
         end
 
         rule(:divergence_note) do

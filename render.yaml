@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: arkham-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    branch: main
+    autoDeploy: false
+    healthCheckPath: /up
+    dockerCommand: >-
+      bash -c "bin/rails db:prepare &&
+      rm -f tmp/pids/server.pid &&
+      bin/rails server -b 0.0.0.0"
+    envVars:
+      - key: RAILS_ENV
+        value: production
+      - key: RAILS_MAX_THREADS
+        value: "5"
+      - key: SOLID_QUEUE_IN_PUMA
+        value: "true"
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: ARKHAM_DATABASE_HOST
+        sync: false
+      - key: ARKHAM_DATABASE_NAME
+        sync: false
+      - key: ARKHAM_DATABASE_USERNAME
+        sync: false
+      - key: ARKHAM_DATABASE_PASSWORD
+        sync: false
+      - key: FILEBASE_ACCESS_KEY_ID
+        sync: false
+      - key: FILEBASE_SECRET_ACCESS_KEY
+        sync: false

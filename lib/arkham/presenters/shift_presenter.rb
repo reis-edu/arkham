@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Presenters
     class ShiftPresenter
@@ -7,7 +9,7 @@ module Arkham
         @viewer_group = viewer_group
       end
 
-      def to_json
+      def to_json(*_args)
         {
           id: @shift.id,
           shift_date: @shift.shift_date,

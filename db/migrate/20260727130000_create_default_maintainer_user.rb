@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateDefaultMaintainerUser < ActiveRecord::Migration[8.0]
   DEFAULT_LOGIN = 'admin.sistema'
 

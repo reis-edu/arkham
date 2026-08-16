@@ -1,10 +1,14 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::UpdateShift do
   let(:shift_repository) { instance_double(Arkham::Repository::ActiveRecord::ShiftRepository) }
   let(:use_case) { described_class.new(shift_repository) }
   let(:shift_id) { SecureRandom.uuid }
-  let(:shift) { Arkham::Domain::Entities::Shift.new(id: shift_id, shift_date: Date.new(2026, 7, 28), shift_type: 'diurno') }
+  let(:shift) do
+    Arkham::Domain::Entities::Shift.new(id: shift_id, shift_date: Date.new(2026, 7, 28), shift_type: 'diurno')
+  end
 
   before do
     allow(shift_repository).to receive(:within_transaction) { |&block| block.call }
@@ -28,7 +32,9 @@ RSpec.describe Arkham::UseCases::UpdateShift do
       before { allow(shift_repository).to receive(:find_by_id).and_return(nil) }
 
       it 'raises ShiftNotFoundError' do
-        expect { use_case.execute(shift_id, { shift_type: 'noturno' }) }.to raise_error(Arkham::Domain::Errors::ShiftNotFoundError)
+        expect do
+          use_case.execute(shift_id, { shift_type: 'noturno' })
+        end.to raise_error(Arkham::Domain::Errors::ShiftNotFoundError)
       end
     end
 
@@ -41,7 +47,9 @@ RSpec.describe Arkham::UseCases::UpdateShift do
 
       it 'raises ShiftAlreadyExistsError' do
         expect(shift_repository).not_to receive(:update)
-        expect { use_case.execute(shift_id, { shift_type: 'noturno' }) }.to raise_error(Arkham::Domain::Errors::ShiftAlreadyExistsError)
+        expect do
+          use_case.execute(shift_id, { shift_type: 'noturno' })
+        end.to raise_error(Arkham::Domain::Errors::ShiftAlreadyExistsError)
       end
     end
 

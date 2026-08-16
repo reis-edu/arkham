@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Presenters
     class ShiftItemPresenter
@@ -5,7 +7,7 @@ module Arkham
         @shift_item = shift_item
       end
 
-      def to_json
+      def to_json(*_args)
         {
           id: @shift_item.id,
           name: @shift_item.name,

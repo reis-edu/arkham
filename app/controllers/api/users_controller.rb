@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   class UsersController < ApplicationController
     before_action :authorize_user_request
@@ -5,7 +7,7 @@ module Api
     before_action :authorize_privileged, only: %i[index create change_group destroy inactivate]
     before_action :forbid_self_target, only: %i[destroy inactivate]
 
-    def initialize(repositories = {})
+    def initialize(_repositories = {})
       @list_users_use_case = Arkham::Dependencies.list_users_use_case
       @create_user_use_case = Arkham::Dependencies.create_user_use_case
       @change_password_use_case = Arkham::Dependencies.change_password_use_case

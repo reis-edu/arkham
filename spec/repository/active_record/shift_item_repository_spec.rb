@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::Repository::ActiveRecord::ShiftItemRepository do
@@ -64,7 +66,9 @@ RSpec.describe Arkham::Repository::ActiveRecord::ShiftItemRepository do
 
     it 'raises ShiftItemInvalidError when validation fails' do
       shift_item = create(:shift_item)
-      expect { repository.update(shift_item.id, name: nil) }.to raise_error(Arkham::Domain::Errors::ShiftItemInvalidError)
+      expect do
+        repository.update(shift_item.id, name: nil)
+      end.to raise_error(Arkham::Domain::Errors::ShiftItemInvalidError)
     end
   end
 

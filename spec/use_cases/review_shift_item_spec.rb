@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::ReviewShiftItem do
@@ -8,11 +10,14 @@ RSpec.describe Arkham::UseCases::ReviewShiftItem do
   let(:shift_item_id) { SecureRandom.uuid }
   let(:check_id) { SecureRandom.uuid }
   let(:actor_id) { SecureRandom.uuid }
-  let(:check) { Arkham::Domain::Entities::ShiftItemCheck.new(id: check_id, shift_id: shift_id, shift_item_id: shift_item_id) }
+  let(:check) do
+    Arkham::Domain::Entities::ShiftItemCheck.new(id: check_id, shift_id: shift_id, shift_item_id: shift_item_id)
+  end
 
   before do
     allow(shift_item_check_repository).to receive(:within_transaction) { |&block| block.call }
-    allow(shift_item_check_repository).to receive(:find_by_shift_and_item).with(shift_id, shift_item_id).and_return(check)
+    allow(shift_item_check_repository).to receive(:find_by_shift_and_item).with(shift_id,
+                                                                                shift_item_id).and_return(check)
   end
 
   describe '#execute' do
@@ -28,7 +33,8 @@ RSpec.describe Arkham::UseCases::ReviewShiftItem do
         expect(shift_item_check_repository).to receive(:update_review).with(
           check_id, hash_including(review_status: 'confirmed', reviewed_by_id: actor_id, divergence_note: nil)
         )
-        use_case.execute(shift_id, shift_item_id, { review_status: 'confirmed' }, actor_id: actor_id, actor_group: 'nursing_team')
+        use_case.execute(shift_id, shift_item_id, { review_status: 'confirmed' }, actor_id: actor_id,
+                                                                                  actor_group: 'nursing_team')
       end
 
       it 'registers a divergence with its note' do
@@ -43,13 +49,15 @@ RSpec.describe Arkham::UseCases::ReviewShiftItem do
 
       it 'raises ApiValidationError when divergent has no note' do
         expect do
-          use_case.execute(shift_id, shift_item_id, { review_status: 'divergent' }, actor_id: actor_id, actor_group: 'nursing_team')
+          use_case.execute(shift_id, shift_item_id, { review_status: 'divergent' }, actor_id: actor_id,
+                                                                                    actor_group: 'nursing_team')
         end.to raise_error(Arkham::Validators::Errors::ApiValidationError)
       end
 
       it 'raises ApiValidationError for an unknown review_status' do
         expect do
-          use_case.execute(shift_id, shift_item_id, { review_status: 'ok' }, actor_id: actor_id, actor_group: 'nursing_team')
+          use_case.execute(shift_id, shift_item_id, { review_status: 'ok' }, actor_id: actor_id,
+                                                                             actor_group: 'nursing_team')
         end.to raise_error(Arkham::Validators::Errors::ApiValidationError)
       end
     end
@@ -62,7 +70,8 @@ RSpec.describe Arkham::UseCases::ReviewShiftItem do
       it 'raises ShiftNotReadyForReviewError' do
         expect(shift_item_check_repository).not_to receive(:update_review)
         expect do
-          use_case.execute(shift_id, shift_item_id, { review_status: 'confirmed' }, actor_id: actor_id, actor_group: 'nursing_team')
+          use_case.execute(shift_id, shift_item_id, { review_status: 'confirmed' }, actor_id: actor_id,
+                                                                                    actor_group: 'nursing_team')
         end.to raise_error(Arkham::Domain::Errors::ShiftNotReadyForReviewError)
       end
     end
@@ -75,14 +84,16 @@ RSpec.describe Arkham::UseCases::ReviewShiftItem do
       it 'forbids a nursing_team actor from correcting the review' do
         expect(shift_item_check_repository).not_to receive(:update_review)
         expect do
-          use_case.execute(shift_id, shift_item_id, { review_status: 'confirmed' }, actor_id: actor_id, actor_group: 'nursing_team')
+          use_case.execute(shift_id, shift_item_id, { review_status: 'confirmed' }, actor_id: actor_id,
+                                                                                    actor_group: 'nursing_team')
         end.to raise_error(Arkham::Domain::Errors::ShiftEditForbiddenError)
       end
 
       it 'allows a nursing_leaders actor to correct the review' do
         allow(shift_item_check_repository).to receive(:update_review).and_return(check_id)
         expect(shift_item_check_repository).to receive(:update_review)
-        use_case.execute(shift_id, shift_item_id, { review_status: 'confirmed' }, actor_id: actor_id, actor_group: 'nursing_leaders')
+        use_case.execute(shift_id, shift_item_id, { review_status: 'confirmed' }, actor_id: actor_id,
+                                                                                  actor_group: 'nursing_leaders')
       end
     end
   end

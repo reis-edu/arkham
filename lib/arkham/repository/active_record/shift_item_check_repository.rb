@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module Arkham
   module Repository
     module ActiveRecord
       class ShiftItemCheckRepository
-        def within_transaction(&block)
+        def within_transaction
           ::ActiveRecord::Base.transaction do
             yield if block_given?
           end
@@ -86,6 +88,7 @@ module Arkham
 
         private
 
+        # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
         def map_to_entity(check)
           Arkham::Domain::Entities::ShiftItemCheck.new(
             id: check.id,
@@ -108,6 +111,7 @@ module Arkham
             divergence_note: check.divergence_note
           )
         end
+        # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::ShowPatient do
@@ -28,4 +30,4 @@ RSpec.describe Arkham::UseCases::ShowPatient do
       end
     end
   end
-end 
+end

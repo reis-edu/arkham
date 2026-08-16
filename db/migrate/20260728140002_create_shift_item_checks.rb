@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateShiftItemChecks < ActiveRecord::Migration[8.0]
   def change
     create_table :shift_item_checks, id: :uuid do |t|

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   class ShiftItemsController < ApplicationController
     before_action :authorize_user_request

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::FinalizeShiftExecution do
@@ -39,7 +41,9 @@ RSpec.describe Arkham::UseCases::FinalizeShiftExecution do
 
       it 'raises ShiftAlreadyFinalizedError' do
         expect(shift_repository).not_to receive(:finalize_execution)
-        expect { use_case.execute(shift_id, {}, actor_id: actor_id) }.to raise_error(Arkham::Domain::Errors::ShiftAlreadyFinalizedError)
+        expect do
+          use_case.execute(shift_id, {}, actor_id: actor_id)
+        end.to raise_error(Arkham::Domain::Errors::ShiftAlreadyFinalizedError)
       end
     end
 
@@ -47,7 +51,9 @@ RSpec.describe Arkham::UseCases::FinalizeShiftExecution do
       before { allow(shift_repository).to receive(:find_by_id).and_return(nil) }
 
       it 'raises ShiftNotFoundError' do
-        expect { use_case.execute(shift_id, {}, actor_id: actor_id) }.to raise_error(Arkham::Domain::Errors::ShiftNotFoundError)
+        expect do
+          use_case.execute(shift_id, {}, actor_id: actor_id)
+        end.to raise_error(Arkham::Domain::Errors::ShiftNotFoundError)
       end
     end
   end

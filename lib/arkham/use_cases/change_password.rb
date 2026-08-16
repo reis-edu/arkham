@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module UseCases
     class ChangePassword
@@ -22,9 +24,7 @@ module Arkham
 
       def validate_params(params)
         result = Validators::Api::ChangePasswordContract.new.call(params)
-        if result.errors.any?
-          raise Validators::Errors::ApiValidationError.new(result.errors.to_h)
-        end
+        raise Validators::Errors::ApiValidationError, result.errors.to_h if result.errors.any?
 
         result.to_h
       end

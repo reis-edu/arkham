@@ -1,0 +1,39 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 105,
+      "fingerprint": "afdf8b23f4603467613d8063fc0210df0326d11345ce24df6a2f9ea2066c97d0",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/api/patients_controller.rb",
+      "line": 70,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "note": "permit! only forwards raw params to the use case; Arkham::UseCases::CreatePatient/UpdatePatient run them through Validators::Api::PatientContract (Dry::Validation), whose #to_h strips any key not explicitly declared in the contract before the repository ever writes to the database."
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 105,
+      "fingerprint": "1bde174a6fb55da80e1b82e97e1b66fceb53e8e777bb0f1ecb45d97bc0a40592",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/api/shift_items_controller.rb",
+      "line": 49,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "note": "permit! only forwards raw params to the use case; the ShiftItem use cases run them through their Dry::Validation contracts (e.g. Validators::Api::ShiftItemContract), whose #to_h strips any key not explicitly declared in the contract before the repository ever writes to the database."
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 105,
+      "fingerprint": "78cf3c88d4a6593417266b0184a08ac6d4551d9dcf94bf89f4bd80006af3ddd5",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/api/shifts_controller.rb",
+      "line": 103,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "note": "permit! only forwards raw params to the use case; the Shift use cases run them through their Dry::Validation contracts (e.g. Validators::Api::ShiftContract), whose #to_h strips any key not explicitly declared in the contract before the repository ever writes to the database."
+    }
+  ],
+  "updated": "2026-08-15 00:00:00 -0300",
+  "brakeman_version": "7.0.2"
+}

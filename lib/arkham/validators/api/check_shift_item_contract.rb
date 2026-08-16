@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Validators
     module Api
@@ -9,9 +11,7 @@ module Arkham
         end
 
         rule(:impossible_reason) do
-          if values[:impossible] && value.blank?
-            key.failure('is required when impossible is true')
-          end
+          key.failure('is required when impossible is true') if values[:impossible] && value.blank?
         end
 
         rule(:checked, :impossible) do

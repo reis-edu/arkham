@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Presenters
     class ShiftListPresenter
@@ -5,7 +7,7 @@ module Arkham
         @shifts = shifts
       end
 
-      def to_json
+      def to_json(*_args)
         {
           shifts: @shifts.map do |shift|
             {

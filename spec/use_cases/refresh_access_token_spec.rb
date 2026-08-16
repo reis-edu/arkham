@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::RefreshAccessToken do
@@ -88,7 +90,8 @@ RSpec.describe Arkham::UseCases::RefreshAccessToken do
     context 'when the user behind the token is inactive' do
       before do
         allow(refresh_token_repository).to receive(:find_by_token_digest).and_return(valid_stored_token)
-        allow(user_repository).to receive(:find_by_id).and_return(Arkham::Domain::Entities::User.new(id: user_id, active: false))
+        allow(user_repository).to receive(:find_by_id).and_return(Arkham::Domain::Entities::User.new(id: user_id,
+                                                                                                     active: false))
       end
 
       it 'raises UserInactiveError' do

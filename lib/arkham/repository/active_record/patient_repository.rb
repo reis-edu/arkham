@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../port'
 
 module Arkham
@@ -6,7 +8,7 @@ module Arkham
       class PatientRepository
         include Arkham::Repository::Port
 
-        def within_transaction(&block)
+        def within_transaction
           ::ActiveRecord::Base.transaction do
             yield if block_given?
           end
@@ -16,11 +18,11 @@ module Arkham
           patients = PatientFilterRepository.new.call(filter_params)
           patients.map { |patient| map_to_entity(patient) }
         end
-        
+
         def find_by_id(patient_id)
           patient = ::Patient.find_by(id: patient_id)
           return nil unless patient
-          
+
           map_to_entity(patient)
         end
 
@@ -59,7 +61,7 @@ module Arkham
         def find_by_cpf(cpf)
           patient = ::Patient.find_by(cpf: cpf)
           return nil unless patient
-          
+
           map_to_entity(patient)
         end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::AddShiftItem do
@@ -20,7 +22,8 @@ RSpec.describe Arkham::UseCases::AddShiftItem do
       before do
         allow(shift_repository).to receive(:find_by_id).with(shift_id).and_return(shift)
         allow(shift_item_repository).to receive(:find_by_id).with(shift_item_id).and_return(shift_item)
-        allow(shift_item_check_repository).to receive(:find_by_shift_and_item).with(shift_id, shift_item_id).and_return(nil)
+        allow(shift_item_check_repository).to receive(:find_by_shift_and_item).with(shift_id,
+                                                                                    shift_item_id).and_return(nil)
         allow(shift_item_check_repository).to receive(:create).and_return('check-id')
       end
 
@@ -34,7 +37,9 @@ RSpec.describe Arkham::UseCases::AddShiftItem do
       before { allow(shift_repository).to receive(:find_by_id).and_return(nil) }
 
       it 'raises ShiftNotFoundError' do
-        expect { use_case.execute(shift_id, shift_item_id: shift_item_id) }.to raise_error(Arkham::Domain::Errors::ShiftNotFoundError)
+        expect do
+          use_case.execute(shift_id, shift_item_id: shift_item_id)
+        end.to raise_error(Arkham::Domain::Errors::ShiftNotFoundError)
       end
     end
 
@@ -59,7 +64,10 @@ RSpec.describe Arkham::UseCases::AddShiftItem do
       end
 
       it 'raises ShiftItemNotFoundError' do
-        expect { use_case.execute(shift_id, shift_item_id: shift_item_id) }.to raise_error(Arkham::Domain::Errors::ShiftItemNotFoundError)
+        expect do
+          use_case.execute(shift_id,
+                           shift_item_id: shift_item_id)
+        end.to raise_error(Arkham::Domain::Errors::ShiftItemNotFoundError)
       end
     end
 

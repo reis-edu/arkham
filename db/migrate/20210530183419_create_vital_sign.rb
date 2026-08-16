@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 class CreateVitalSign < ActiveRecord::Migration[6.0]
   def change

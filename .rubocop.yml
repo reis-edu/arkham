@@ -1,4 +1,4 @@
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
 
 Metrics/MethodLength:
@@ -9,7 +9,8 @@ Metrics/AbcSize:
 
 Metrics/BlockLength:
   Exclude:
-    - 'spec/**/*' 
+    - 'spec/**/*'
+    - 'config/routes.rb'
 
 Style/Documentation:
   Enabled: false
@@ -27,7 +28,6 @@ AllCops:
   Exclude:
     - 'vendor/**/*'
     - 'node_modules/**/*'
-    - 'db/*'
-    - 'db/fixtures/**/*'
+    - 'db/**/*'
     - 'tmp/**/*'
     - 'bin/*'

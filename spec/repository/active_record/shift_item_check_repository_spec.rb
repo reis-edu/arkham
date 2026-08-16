@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::Repository::ActiveRecord::ShiftItemCheckRepository do
@@ -157,7 +159,8 @@ RSpec.describe Arkham::Repository::ActiveRecord::ShiftItemCheckRepository do
       check = create(:shift_item_check)
       user = create(:user)
 
-      repository.update_review(check.id, review_status: 'confirmed', reviewed_by_id: user.id, reviewed_at: Time.current, divergence_note: nil)
+      repository.update_review(check.id, review_status: 'confirmed', reviewed_by_id: user.id,
+                                         reviewed_at: Time.current, divergence_note: nil)
 
       expect(check.reload.review_status).to eq('confirmed')
       expect(check.reviewed_by_id).to eq(user.id)

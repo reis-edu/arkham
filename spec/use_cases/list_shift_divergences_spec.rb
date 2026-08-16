@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::ListShiftDivergences do
@@ -10,7 +12,8 @@ RSpec.describe Arkham::UseCases::ListShiftDivergences do
     context 'when the shift exists' do
       it 'returns its divergent checks' do
         divergences = [Arkham::Domain::Entities::ShiftItemCheck.new(id: SecureRandom.uuid, review_status: 'divergent')]
-        allow(shift_repository).to receive(:find_by_id).with(shift_id).and_return(Arkham::Domain::Entities::Shift.new(id: shift_id))
+        allow(shift_repository).to receive(:find_by_id)
+          .with(shift_id).and_return(Arkham::Domain::Entities::Shift.new(id: shift_id))
         allow(shift_item_check_repository).to receive(:divergences_for_shift).with(shift_id).and_return(divergences)
 
         expect(use_case.execute(shift_id)).to eq(divergences)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module UseCases
     class CheckShiftItem
@@ -23,7 +25,7 @@ module Arkham
 
       def validate_params(params)
         result = Validators::Api::CheckShiftItemContract.new.call(params)
-        raise Validators::Errors::ApiValidationError.new(result.errors.to_h) if result.errors.any?
+        raise Validators::Errors::ApiValidationError, result.errors.to_h if result.errors.any?
 
         result.to_h
       end
@@ -50,6 +52,7 @@ module Arkham
               'Only a shift manager can edit checks after the shift has been finalized'
       end
 
+      # rubocop:disable Metrics/MethodLength
       def build_attributes(validated, actor_id)
         if validated[:impossible]
           {
@@ -69,6 +72,7 @@ module Arkham
           }
         end
       end
+      # rubocop:enable Metrics/MethodLength
     end
   end
 end

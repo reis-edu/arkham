@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Api::ShiftItemChecksController, type: :controller do
@@ -30,7 +32,8 @@ RSpec.describe Api::ShiftItemChecksController, type: :controller do
 
       it 'returns unprocessable_entity when checked and impossible are both submitted' do
         put :check, params: {
-          shift_id: shift.id, shift_item_id: check.shift_item_id, checked: true, impossible: true, impossible_reason: 'x'
+          shift_id: shift.id, shift_item_id: check.shift_item_id,
+          checked: true, impossible: true, impossible_reason: 'x'
         }, as: :json
 
         expect(response).to have_http_status(:unprocessable_entity)
@@ -82,7 +85,8 @@ RSpec.describe Api::ShiftItemChecksController, type: :controller do
     before { auth_header_for(actor) }
 
     it 'confirms the item' do
-      put :review, params: { shift_id: shift.id, shift_item_id: check.shift_item_id, review_status: 'confirmed' }, as: :json
+      put :review, params: { shift_id: shift.id, shift_item_id: check.shift_item_id, review_status: 'confirmed' },
+                   as: :json
 
       expect(response).to have_http_status(:ok)
       expect(check.reload.review_status).to eq('confirmed')
@@ -90,7 +94,8 @@ RSpec.describe Api::ShiftItemChecksController, type: :controller do
 
     it 'registers a divergence with its note' do
       put :review, params: {
-        shift_id: shift.id, shift_item_id: check.shift_item_id, review_status: 'divergent', divergence_note: 'Não confere'
+        shift_id: shift.id, shift_item_id: check.shift_item_id,
+        review_status: 'divergent', divergence_note: 'Não confere'
       }, as: :json
 
       expect(response).to have_http_status(:ok)
@@ -98,7 +103,8 @@ RSpec.describe Api::ShiftItemChecksController, type: :controller do
     end
 
     it 'returns unprocessable_entity when divergent has no note' do
-      put :review, params: { shift_id: shift.id, shift_item_id: check.shift_item_id, review_status: 'divergent' }, as: :json
+      put :review, params: { shift_id: shift.id, shift_item_id: check.shift_item_id, review_status: 'divergent' },
+                   as: :json
       expect(response).to have_http_status(:unprocessable_entity)
     end
 
@@ -106,7 +112,8 @@ RSpec.describe Api::ShiftItemChecksController, type: :controller do
       let(:shift) { create(:shift) }
 
       it 'returns unprocessable_entity' do
-        put :review, params: { shift_id: shift.id, shift_item_id: check.shift_item_id, review_status: 'confirmed' }, as: :json
+        put :review, params: { shift_id: shift.id, shift_item_id: check.shift_item_id, review_status: 'confirmed' },
+                     as: :json
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end

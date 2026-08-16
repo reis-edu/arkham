@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'aws-sdk-s3'
 
 module Arkham
@@ -6,7 +8,7 @@ module Arkham
       class PatientPhoto
         attr_reader :patient_id, :base64_image, :base64_image_format, :photo_url, :photo_key
 
-        def initialize(storage, patient_id, base64_image, base64_image_format = 'png', s3_resource = nil)
+        def initialize(storage, patient_id, base64_image, base64_image_format = 'png', _s3_resource = nil)
           @base64_image = base64_image
           @patient_id = patient_id
           @base64_image_format = base64_image_format

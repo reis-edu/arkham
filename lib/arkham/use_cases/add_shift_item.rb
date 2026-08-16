@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module UseCases
     class AddShiftItem
@@ -23,7 +25,7 @@ module Arkham
 
       def validate_params(params)
         result = Validators::Api::AddShiftItemContract.new.call(params)
-        raise Validators::Errors::ApiValidationError.new(result.errors.to_h) if result.errors.any?
+        raise Validators::Errors::ApiValidationError, result.errors.to_h if result.errors.any?
 
         result.to_h
       end
@@ -38,7 +40,8 @@ module Arkham
       def guard_open!(shift)
         return if shift.open?
 
-        raise Domain::Errors::ShiftAlreadyFinalizedError, 'Shift items can only be added or removed while the shift is open'
+        raise Domain::Errors::ShiftAlreadyFinalizedError,
+              'Shift items can only be added or removed while the shift is open'
       end
 
       def find_shift_item(shift_item_id)

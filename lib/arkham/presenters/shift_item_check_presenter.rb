@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Presenters
     class ShiftItemCheckPresenter
@@ -6,7 +8,8 @@ module Arkham
         @viewer_group = viewer_group
       end
 
-      def to_json
+      # rubocop:disable Metrics/MethodLength
+      def to_json(*_args)
         {
           id: @check.id,
           shift_item_id: @check.shift_item_id,
@@ -26,6 +29,7 @@ module Arkham
           reviewed_at: @check.reviewed_at
         }.merge(manager_only_fields)
       end
+      # rubocop:enable Metrics/MethodLength
 
       private
 

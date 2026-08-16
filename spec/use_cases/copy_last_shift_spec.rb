@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::CopyLastShift do
@@ -19,7 +21,8 @@ RSpec.describe Arkham::UseCases::CopyLastShift do
 
       before do
         allow(shift_repository).to receive(:find_last_by_type).with('noturno').and_return(previous_shift)
-        allow(shift_item_check_repository).to receive(:find_all_for_shift).with('previous-id').and_return(previous_checks)
+        allow(shift_item_check_repository).to receive(:find_all_for_shift)
+          .with('previous-id').and_return(previous_checks)
         allow(create_shift).to receive(:execute).and_return('new-shift-id')
       end
 
@@ -47,7 +50,9 @@ RSpec.describe Arkham::UseCases::CopyLastShift do
       end
 
       it 'raises ApiValidationError when shift_date is missing' do
-        expect { use_case.execute(shift_type: 'noturno') }.to raise_error(Arkham::Validators::Errors::ApiValidationError)
+        expect do
+          use_case.execute(shift_type: 'noturno')
+        end.to raise_error(Arkham::Validators::Errors::ApiValidationError)
       end
     end
   end

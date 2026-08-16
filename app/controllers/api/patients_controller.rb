@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 module Api
   class PatientsController < ApplicationController
-    def initialize(repositories = {})
+    def initialize(_repositories = {})
       @show_patient_use_case = Arkham::Dependencies.show_patient_use_case
       @list_patients_use_case = Arkham::Dependencies.list_patients_use_case
       @create_patient_use_case = Arkham::Dependencies.create_patient_use_case

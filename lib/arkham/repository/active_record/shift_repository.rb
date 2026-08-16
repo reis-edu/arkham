@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../port'
 
 module Arkham
@@ -6,7 +8,7 @@ module Arkham
       class ShiftRepository
         include Arkham::Repository::Port
 
-        def within_transaction(&block)
+        def within_transaction
           ::ActiveRecord::Base.transaction do
             yield if block_given?
           end

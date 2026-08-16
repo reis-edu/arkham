@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::Presenters::PatientPresenter do
@@ -80,7 +82,8 @@ RSpec.describe Arkham::Presenters::PatientPresenter do
       end
 
       it 'defaults to Arkham::Dependencies.get_presigned_profile_url_use_case' do
-        expect(Arkham::Dependencies).to receive(:get_presigned_profile_url_use_case).and_return(get_presigned_profile_url_use_case)
+        expect(Arkham::Dependencies).to receive(:get_presigned_profile_url_use_case)
+          .and_return(get_presigned_profile_url_use_case)
 
         described_class.new(patient)
       end

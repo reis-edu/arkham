@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::CheckShiftItem do
@@ -8,11 +10,14 @@ RSpec.describe Arkham::UseCases::CheckShiftItem do
   let(:shift_item_id) { SecureRandom.uuid }
   let(:check_id) { SecureRandom.uuid }
   let(:actor_id) { SecureRandom.uuid }
-  let(:check) { Arkham::Domain::Entities::ShiftItemCheck.new(id: check_id, shift_id: shift_id, shift_item_id: shift_item_id) }
+  let(:check) do
+    Arkham::Domain::Entities::ShiftItemCheck.new(id: check_id, shift_id: shift_id, shift_item_id: shift_item_id)
+  end
 
   before do
     allow(shift_item_check_repository).to receive(:within_transaction) { |&block| block.call }
-    allow(shift_item_check_repository).to receive(:find_by_shift_and_item).with(shift_id, shift_item_id).and_return(check)
+    allow(shift_item_check_repository).to receive(:find_by_shift_and_item).with(shift_id,
+                                                                                shift_item_id).and_return(check)
   end
 
   describe '#execute' do
@@ -43,7 +48,8 @@ RSpec.describe Arkham::UseCases::CheckShiftItem do
 
       it 'raises ApiValidationError when impossible has no reason' do
         expect do
-          use_case.execute(shift_id, shift_item_id, { impossible: true }, actor_id: actor_id, actor_group: 'nursing_team')
+          use_case.execute(shift_id, shift_item_id, { impossible: true }, actor_id: actor_id,
+                                                                          actor_group: 'nursing_team')
         end.to raise_error(Arkham::Validators::Errors::ApiValidationError)
       end
 

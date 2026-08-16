@@ -1,16 +1,17 @@
+# frozen_string_literal: true
+
 require 'aws-sdk-s3'
 
 module Arkham
   module Repository
     module Filebase
       class PatientPhotoRepository
-        attr_reader :s3_client, :s3_resource
-        
-        def initialize(model = {})
+        def initialize(_model = {})
           @s3_client = s3_client
           @s3_resource = s3_resource
         end
 
+        # rubocop:disable Metrics/MethodLength
         def save(patient_id, photo_base64, photo_base64_format)
           patient_photo = PatientPhoto.new(
             @s3_resource,
@@ -29,31 +30,34 @@ module Arkham
 
           patient_photo
         rescue StandardError => e
-          raise Domain::Errors::PatientPhotoError.new("Error on save patient photo! Error: #{e}")
+          raise Domain::Errors::PatientPhotoError, "Error on save patient photo! Error: #{e}"
         end
+        # rubocop:enable Metrics/MethodLength
 
         def delete(photo_key)
           return unless photo_key.present?
 
           @s3_resource.bucket(Arkham.config[:filebase][:bucket]).object(photo_key).delete
         rescue StandardError => e
-          raise Domain::Errors::PatientPhotoError.new("Error on delete patient photo! Error: #{e}")
+          raise Domain::Errors::PatientPhotoError, "Error on delete patient photo! Error: #{e}"
         end
 
+        # rubocop:disable Style/MultilineBlockChain
         def get_presigned_profile_url(patient_photo_key)
-          Rails.cache.fetch("presigned_url:#{patient_photo_key}", expires_in: Arkham.config[:filebase][:presigned_url_expiration]) do
+          Rails.cache.fetch("presigned_url:#{patient_photo_key}",
+                            expires_in: Arkham.config[:filebase][:presigned_url_expiration]) do
             Rails.logger.info("[S3 Presigned URL] Cache miss for key: #{patient_photo_key}. Generating new URL.")
             signer = Aws::S3::Presigner.new(client: @s3_client)
 
             signer.presigned_url(:get_object,
-              bucket: Arkham.config[:filebase][:bucket],
-              key: patient_photo_key,
-              expires_in: Arkham.config[:filebase][:presigned_url_expiration]
-            )
-          end.tap do |url|
+                                 bucket: Arkham.config[:filebase][:bucket],
+                                 key: patient_photo_key,
+                                 expires_in: Arkham.config[:filebase][:presigned_url_expiration])
+          end.tap do |_url|
             Rails.logger.info("[S3 Presigned URL] Cache hit for key: #{patient_photo_key}. Returning cached URL.")
           end
         end
+        # rubocop:enable Style/MultilineBlockChain
 
         private
 

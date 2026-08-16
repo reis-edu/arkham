@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module UseCases
     class InactivatePatient
@@ -6,21 +8,19 @@ module Arkham
       end
 
       def execute(patient_id)
-        patient = find_patient(patient_id)
+        find_patient(patient_id)
 
         @patient_repository.inactivate(patient_id)
 
         patient_id
       end
-      
+
       private
-      
+
       def find_patient(patient_id)
         patient = @patient_repository.find_by_id(patient_id)
 
-        unless patient
-          raise Arkham::Domain::Errors::PatientNotFoundError, 'Patient not found'
-        end
+        raise Arkham::Domain::Errors::PatientNotFoundError, 'Patient not found' unless patient
 
         patient
       end

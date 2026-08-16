@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Api::PatientsController, type: :controller do
@@ -32,13 +34,13 @@ RSpec.describe Api::PatientsController, type: :controller do
 
         expect(response).to have_http_status(:ok)
         expect(response.body).to be_present
-        
+
         json_response = JSON.parse(response.body)
         expect(json_response).to be_a(Hash)
         expect(json_response['patients']).to be_present
         expect(json_response['patients']).to be_an(Array)
         expect(json_response['patients'].length).to eq(1)
-        
+
         patient_response = json_response['patients'].first
         expect(patient_response).to include(
           'id',
@@ -52,7 +54,7 @@ RSpec.describe Api::PatientsController, type: :controller do
           'age',
           'active'
         )
-        
+
         expect(patient_response['id']).to eq(patient.id)
         expect(patient_response['firstname']).to eq(patient.firstname)
         expect(patient_response['lastname']).to eq(patient.lastname)
@@ -75,13 +77,13 @@ RSpec.describe Api::PatientsController, type: :controller do
 
         expect(response).to have_http_status(:ok)
         expect(response.body).to be_present
-        
+
         json_response = JSON.parse(response.body)
         expect(json_response).to be_a(Hash)
         expect(json_response['patients']).to be_present
         expect(json_response['patients']).to be_an(Array)
         expect(json_response['patients'].length).to eq(1)
-        
+
         patient_response = json_response['patients'].first
         expect(patient_response['status']).to eq('active')
         expect(patient_response['id']).to eq(active_patient.id)
@@ -112,7 +114,7 @@ RSpec.describe Api::PatientsController, type: :controller do
         json_response = JSON.parse(response.body)
         expect(json_response).to be_a(Hash)
         expect(json_response['id']).to be_present
-        
+
         created_patient = Patient.find(json_response['id'])
         expect(created_patient.firstname).to eq(patient_params[:firstname])
         expect(created_patient.lastname).to eq(patient_params[:lastname])
@@ -157,7 +159,7 @@ RSpec.describe Api::PatientsController, type: :controller do
 
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.body).to be_present
-        
+
         json_response = JSON.parse(response.body)
         expect(json_response).to be_a(Hash)
         expect(json_response['error']).to be_present
@@ -185,11 +187,11 @@ RSpec.describe Api::PatientsController, type: :controller do
 
         expect(response).to have_http_status(:ok)
         expect(response.body).to be_present
-        
+
         json_response = JSON.parse(response.body)
         expect(json_response).to be_a(Hash)
         expect(json_response['id']).to eq(patient.id)
-        
+
         updated_patient = Patient.find(patient.id)
         expect(updated_patient.firstname).to eq(patient_params[:firstname])
         expect(updated_patient.lastname).to eq(patient_params[:lastname])
@@ -227,7 +229,7 @@ RSpec.describe Api::PatientsController, type: :controller do
 
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.body).to be_present
-        
+
         json_response = JSON.parse(response.body)
         expect(json_response).to be_a(Hash)
         expect(json_response['error']).to be_present
@@ -240,9 +242,9 @@ RSpec.describe Api::PatientsController, type: :controller do
 
     context 'when patient is destroyed successfully' do
       it 'returns ok status' do
-        expect {
+        expect do
           delete :destroy, params: { id: patient.id }
-        }.to change(Patient, :count).by(-1)
+        end.to change(Patient, :count).by(-1)
 
         expect(response).to have_http_status(:ok)
       end
@@ -266,11 +268,11 @@ RSpec.describe Api::PatientsController, type: :controller do
 
         expect(response).to have_http_status(:ok)
         expect(response.body).to be_present
-        
+
         json_response = JSON.parse(response.body)
         expect(json_response).to be_a(Hash)
         expect(json_response['id']).to eq(patient.id)
-        
+
         activated_patient = Patient.find(patient.id)
         expect(activated_patient.status).to eq('active')
       end
@@ -294,11 +296,11 @@ RSpec.describe Api::PatientsController, type: :controller do
 
         expect(response).to have_http_status(:ok)
         expect(response.body).to be_present
-        
+
         json_response = JSON.parse(response.body)
         expect(json_response).to be_a(Hash)
         expect(json_response['id']).to eq(patient.id)
-        
+
         inactivated_patient = Patient.find(patient.id)
         expect(inactivated_patient.status).to eq('inactive')
       end

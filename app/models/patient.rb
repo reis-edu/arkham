@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Patient < ApplicationRecord
   has_many :medicament_managements, dependent: :destroy
   has_many :medicaments, through: :medicament_managements
@@ -16,7 +18,7 @@ class Patient < ApplicationRecord
 
   def age
     Date.today.year - birth_date.year
-  rescue
+  rescue StandardError
     0
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Validators
     module Api
@@ -7,9 +9,7 @@ module Arkham
         end
 
         rule(:group) do
-          unless ::User::GROUPS.include?(value)
-            key.failure("must be one of: #{::User::GROUPS.join(', ')}")
-          end
+          key.failure("must be one of: #{::User::GROUPS.join(', ')}") unless ::User::GROUPS.include?(value)
         end
       end
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Api::UsersController, type: :controller do
@@ -121,14 +123,16 @@ RSpec.describe Api::UsersController, type: :controller do
     before { auth_header_for(actor) }
 
     it 'updates the password and returns the user id' do
-      put :change_password, params: { id: actor.id, current_password: 'Arkham@2026', new_password: 'NovaSenha123' }, format: :json
+      put :change_password, params: { id: actor.id, current_password: 'Arkham@2026', new_password: 'NovaSenha123' },
+                            format: :json
 
       expect(response).to have_http_status(:ok)
       expect(actor.reload.authenticate('NovaSenha123')).to be_truthy
     end
 
     it 'returns unauthorized when the current password is wrong' do
-      put :change_password, params: { id: actor.id, current_password: 'wrong', new_password: 'NovaSenha123' }, format: :json
+      put :change_password, params: { id: actor.id, current_password: 'wrong', new_password: 'NovaSenha123' },
+                            format: :json
       expect(response).to have_http_status(:unauthorized)
     end
 
@@ -147,7 +151,8 @@ RSpec.describe Api::UsersController, type: :controller do
       it 'returns forbidden without touching the target password' do
         other_user = create(:user, password: 'Outra@123')
 
-        put :change_password, params: { id: other_user.id, current_password: 'Outra@123', new_password: 'NovaSenha123' }, format: :json
+        put :change_password,
+            params: { id: other_user.id, current_password: 'Outra@123', new_password: 'NovaSenha123' }, format: :json
 
         expect(response).to have_http_status(:forbidden)
         expect(other_user.reload.authenticate('Outra@123')).to be_truthy
@@ -160,7 +165,8 @@ RSpec.describe Api::UsersController, type: :controller do
       it 'is allowed past the ownership guard (still subject to the current password check)' do
         other_user = create(:user, password: 'Outra@123')
 
-        put :change_password, params: { id: other_user.id, current_password: 'Outra@123', new_password: 'NovaSenha123' }, format: :json
+        put :change_password,
+            params: { id: other_user.id, current_password: 'Outra@123', new_password: 'NovaSenha123' }, format: :json
 
         expect(response).to have_http_status(:ok)
         expect(other_user.reload.authenticate('NovaSenha123')).to be_truthy

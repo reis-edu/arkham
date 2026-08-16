@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 module Api
   class AuthenticationController < ApplicationController
-    def initialize(repositories = {})
+    def initialize(_repositories = {})
       @login_use_case = Arkham::Dependencies.login_use_case
       @refresh_access_token_use_case = Arkham::Dependencies.refresh_access_token_use_case
     end

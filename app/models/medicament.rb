@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Medicament < ApplicationRecord
   has_many :medicament_managements
   has_many :patients, through: :medicament_managements

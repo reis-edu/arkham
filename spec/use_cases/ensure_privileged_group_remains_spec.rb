@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::EnsurePrivilegedGroupRemains do
@@ -49,7 +51,9 @@ RSpec.describe Arkham::UseCases::EnsurePrivilegedGroupRemains do
         allow(user_repository).to receive(:count_active_in_groups)
           .with(%w[administrator maintainer], excluding_user_id: user_id).and_return(0)
 
-        expect { service.call(user, new_group: 'employer') }.to raise_error(Arkham::Domain::Errors::LastAdministratorError)
+        expect do
+          service.call(user, new_group: 'employer')
+        end.to raise_error(Arkham::Domain::Errors::LastAdministratorError)
       end
     end
   end

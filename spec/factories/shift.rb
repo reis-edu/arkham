@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :shift do
     sequence(:shift_date) { |n| Date.new(2026, 1, 1) + n.days }

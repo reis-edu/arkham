@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Presenters
     class UserPresenter
@@ -5,7 +7,7 @@ module Arkham
         @user = user
       end
 
-      def to_json
+      def to_json(*_args)
         {
           id: @user.id,
           name: @user.name,

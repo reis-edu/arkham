@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::UpdateShiftItem do
@@ -40,7 +42,9 @@ RSpec.describe Arkham::UseCases::UpdateShiftItem do
       before { allow(shift_item_repository).to receive(:find_by_id).and_return(nil) }
 
       it 'raises ShiftItemNotFoundError' do
-        expect { use_case.execute(shift_item_id, { name: 'x' }) }.to raise_error(Arkham::Domain::Errors::ShiftItemNotFoundError)
+        expect do
+          use_case.execute(shift_item_id, { name: 'x' })
+        end.to raise_error(Arkham::Domain::Errors::ShiftItemNotFoundError)
       end
     end
 
@@ -48,7 +52,9 @@ RSpec.describe Arkham::UseCases::UpdateShiftItem do
       before do
         allow(shift_item_repository).to receive(:find_by_id).with(shift_item_id).and_return(shift_item)
         allow(shift_item_repository).to receive(:find_by_name).with('Nome em uso')
-          .and_return(Arkham::Domain::Entities::ShiftItem.new(id: 'other-id', name: 'Nome em uso'))
+                                                              .and_return(Arkham::Domain::Entities::ShiftItem.new(
+                                                                            id: 'other-id', name: 'Nome em uso'
+                                                                          ))
       end
 
       it 'raises ShiftItemAlreadyExistsError' do

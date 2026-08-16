@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Presenters
     class PatientCreatedPresenter
@@ -5,7 +7,7 @@ module Arkham
         @patient_id = patient_id
       end
 
-      def to_json
+      def to_json(*_args)
         {
           id: @patient_id
         }

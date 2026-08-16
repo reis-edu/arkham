@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::RemoveShiftItem do
@@ -19,7 +21,8 @@ RSpec.describe Arkham::UseCases::RemoveShiftItem do
 
       before do
         allow(shift_repository).to receive(:find_by_id).with(shift_id).and_return(shift)
-        allow(shift_item_check_repository).to receive(:find_by_shift_and_item).with(shift_id, shift_item_id).and_return(check)
+        allow(shift_item_check_repository).to receive(:find_by_shift_and_item).with(shift_id,
+                                                                                    shift_item_id).and_return(check)
         allow(shift_item_check_repository).to receive(:destroy).and_return(check_id)
       end
 
@@ -44,7 +47,9 @@ RSpec.describe Arkham::UseCases::RemoveShiftItem do
 
       it 'raises ShiftAlreadyFinalizedError and does not destroy anything' do
         expect(shift_item_check_repository).not_to receive(:destroy)
-        expect { use_case.execute(shift_id, shift_item_id) }.to raise_error(Arkham::Domain::Errors::ShiftAlreadyFinalizedError)
+        expect do
+          use_case.execute(shift_id, shift_item_id)
+        end.to raise_error(Arkham::Domain::Errors::ShiftAlreadyFinalizedError)
       end
     end
 
@@ -57,7 +62,9 @@ RSpec.describe Arkham::UseCases::RemoveShiftItem do
       end
 
       it 'raises ShiftItemCheckNotFoundError' do
-        expect { use_case.execute(shift_id, shift_item_id) }.to raise_error(Arkham::Domain::Errors::ShiftItemCheckNotFoundError)
+        expect do
+          use_case.execute(shift_id, shift_item_id)
+        end.to raise_error(Arkham::Domain::Errors::ShiftItemCheckNotFoundError)
       end
     end
   end

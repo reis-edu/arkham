@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :medicament_management, class: 'MedicamentManagement' do
     quantity        { 50 }

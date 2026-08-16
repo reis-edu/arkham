@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::InactivateUser do
@@ -43,8 +45,12 @@ RSpec.describe Arkham::UseCases::InactivateUser do
     context 'when inactivating would leave no active administrator/maintainer' do
       before do
         allow(user_repository).to receive(:find_by_id).with(user_id).and_return(user)
-        allow(ensure_privileged_group_remains).to receive(:call).with(user)
-          .and_raise(Arkham::Domain::Errors::LastAdministratorError, 'At least one active administrator or maintainer must remain')
+        allow(ensure_privileged_group_remains).to receive(:call)
+          .with(user)
+          .and_raise(
+            Arkham::Domain::Errors::LastAdministratorError,
+            'At least one active administrator or maintainer must remain'
+          )
       end
 
       it 'raises LastAdministratorError and does not inactivate the user' do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Presenters
     class UserListPresenter
@@ -5,7 +7,7 @@ module Arkham
         @users = users
       end
 
-      def to_json
+      def to_json(*_args)
         {
           users: @users.map { |user| UserPresenter.new(user).to_json }
         }

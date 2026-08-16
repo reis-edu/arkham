@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::UpdatePatient do
@@ -8,7 +10,10 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
       photo_key: 'mock-photo-key'
     )
   end
-  let(:patient_repository) { instance_double('PatientRepository', within_transaction: nil, find_by_cpf: instance_double('Arkham::Domain::Entities::Patient', id: '123')) }
+  let(:patient_repository) do
+    instance_double('PatientRepository', within_transaction: nil,
+                                         find_by_cpf: instance_double('Arkham::Domain::Entities::Patient', id: '123'))
+  end
   let(:patient_photo_repository) { instance_double('PatientPhotoRepository') }
   let(:use_case) { described_class.new(patient_repository, patient_photo_repository) }
 
@@ -61,7 +66,9 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
         end
 
         it 'raises PatientAlreadyExistsError' do
-          expect { use_case.execute(patient_id, valid_params) }.to raise_error(Arkham::Domain::Errors::PatientAlreadyExistsError)
+          expect do
+            use_case.execute(patient_id, valid_params)
+          end.to raise_error(Arkham::Domain::Errors::PatientAlreadyExistsError)
         end
       end
 
@@ -88,7 +95,9 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
       end
 
       it 'raises PatientNotFoundError' do
-        expect { use_case.execute(patient_id, valid_params) }.to raise_error(Arkham::Domain::Errors::PatientNotFoundError)
+        expect do
+          use_case.execute(patient_id, valid_params)
+        end.to raise_error(Arkham::Domain::Errors::PatientNotFoundError)
       end
     end
 
@@ -104,7 +113,9 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
         end
 
         it 'raises ApiValidationError' do
-          expect { use_case.execute(patient_id, empty_params) }.to raise_error(Arkham::Validators::Errors::ApiValidationError)
+          expect do
+            use_case.execute(patient_id, empty_params)
+          end.to raise_error(Arkham::Validators::Errors::ApiValidationError)
         end
 
         it 'preserves the detailed message and field errors on the raised exception' do
@@ -121,7 +132,9 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
         end
 
         it 'raises ArgumentError' do
-          expect { use_case.execute(patient_id, nil) }.to raise_error(ArgumentError, 'Input must be a Hash. NilClass was given.')
+          expect do
+            use_case.execute(patient_id, nil)
+          end.to raise_error(ArgumentError, 'Input must be a Hash. NilClass was given.')
         end
       end
 
@@ -133,7 +146,9 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
         end
 
         it 'raises ApiValidationError' do
-          expect { use_case.execute(patient_id, missing_fields_params) }.to raise_error(Arkham::Validators::Errors::ApiValidationError)
+          expect do
+            use_case.execute(patient_id, missing_fields_params)
+          end.to raise_error(Arkham::Validators::Errors::ApiValidationError)
         end
       end
 
@@ -153,7 +168,9 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
         end
 
         it 'raises ApiValidationError' do
-          expect { use_case.execute(patient_id, invalid_types_params) }.to raise_error(Arkham::Validators::Errors::ApiValidationError)
+          expect do
+            use_case.execute(patient_id, invalid_types_params)
+          end.to raise_error(Arkham::Validators::Errors::ApiValidationError)
         end
       end
 
@@ -173,7 +190,9 @@ RSpec.describe Arkham::UseCases::UpdatePatient do
         end
 
         it 'raises ApiValidationError' do
-          expect { use_case.execute(patient_id, invalid_values_params) }.to raise_error(Arkham::Validators::Errors::ApiValidationError)
+          expect do
+            use_case.execute(patient_id, invalid_values_params)
+          end.to raise_error(Arkham::Validators::Errors::ApiValidationError)
         end
       end
     end

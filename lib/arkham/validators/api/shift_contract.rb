@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module Validators
     module Api
@@ -9,9 +11,7 @@ module Arkham
         end
 
         rule(:shift_type) do
-          unless ::Shift::TYPES.include?(value)
-            key.failure("must be one of: #{::Shift::TYPES.join(', ')}")
-          end
+          key.failure("must be one of: #{::Shift::TYPES.join(', ')}") unless ::Shift::TYPES.include?(value)
         end
 
         rule(:shift_item_ids) do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::CreateShiftItem do
@@ -25,7 +27,9 @@ RSpec.describe Arkham::UseCases::CreateShiftItem do
     context 'when a shift item with the same name already exists' do
       before do
         allow(shift_item_repository).to receive(:find_by_name).with('Aferir pressão')
-          .and_return(Arkham::Domain::Entities::ShiftItem.new(id: 'other-id', name: 'Aferir pressão'))
+                                                              .and_return(Arkham::Domain::Entities::ShiftItem.new(
+                                                                            id: 'other-id', name: 'Aferir pressão'
+                                                                          ))
       end
 
       it 'raises ShiftItemAlreadyExistsError and does not create anything' do
@@ -36,7 +40,9 @@ RSpec.describe Arkham::UseCases::CreateShiftItem do
 
     context 'when params are invalid' do
       it 'raises ApiValidationError when name is missing' do
-        expect { use_case.execute(description: 'sem nome') }.to raise_error(Arkham::Validators::Errors::ApiValidationError)
+        expect do
+          use_case.execute(description: 'sem nome')
+        end.to raise_error(Arkham::Validators::Errors::ApiValidationError)
       end
     end
   end

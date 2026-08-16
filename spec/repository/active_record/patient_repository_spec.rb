@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::Repository::ActiveRecord::PatientRepository do
@@ -15,7 +17,9 @@ RSpec.describe Arkham::Repository::ActiveRecord::PatientRepository do
       end
 
       it 'raises Arkham::Domain::Errors::PatientInvalidError instead of ActiveRecord::RecordInvalid' do
-        expect { repository.create(invalid_params) }.to raise_error(Arkham::Domain::Errors::PatientInvalidError, /Firstname/)
+        expect do
+          repository.create(invalid_params)
+        end.to raise_error(Arkham::Domain::Errors::PatientInvalidError, /Firstname/)
       end
     end
   end
@@ -25,7 +29,9 @@ RSpec.describe Arkham::Repository::ActiveRecord::PatientRepository do
 
     context 'when the update params fail model validation' do
       it 'raises Arkham::Domain::Errors::PatientInvalidError instead of ActiveRecord::RecordInvalid' do
-        expect { repository.update(patient.id, firstname: '') }.to raise_error(Arkham::Domain::Errors::PatientInvalidError, /Firstname/)
+        expect do
+          repository.update(patient.id, firstname: '')
+        end.to raise_error(Arkham::Domain::Errors::PatientInvalidError, /Firstname/)
       end
     end
   end

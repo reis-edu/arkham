@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Arkham
   module UseCases
     class CreateUser
@@ -21,7 +23,7 @@ module Arkham
         result = Validators::Api::UserContract.new.call(params)
         if result.errors.any?
           Rails.logger.error("Validators::Errors::ApiValidationError #{result.errors.to_h}")
-          raise Validators::Errors::ApiValidationError.new(result.errors.to_h)
+          raise Validators::Errors::ApiValidationError, result.errors.to_h
         end
 
         result.to_h
@@ -29,9 +31,9 @@ module Arkham
 
       def check_duplicate_login(login)
         existing_user = @user_repository.find_by_login(login)
-        if existing_user
-          raise Domain::Errors::UserAlreadyExistsError, 'User with this login already exists!'
-        end
+        return unless existing_user
+
+        raise Domain::Errors::UserAlreadyExistsError, 'User with this login already exists!'
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Arkham::UseCases::CreatePatient do
@@ -91,7 +93,9 @@ RSpec.describe Arkham::UseCases::CreatePatient do
         let(:missing_fields_params) { { firstname: 'John' } }
 
         it 'raises ApiValidationError' do
-          expect { use_case.execute(missing_fields_params) }.to raise_error(Arkham::Validators::Errors::ApiValidationError)
+          expect do
+            use_case.execute(missing_fields_params)
+          end.to raise_error(Arkham::Validators::Errors::ApiValidationError)
         end
       end
 
@@ -107,7 +111,9 @@ RSpec.describe Arkham::UseCases::CreatePatient do
         end
 
         it 'raises ApiValidationError' do
-          expect { use_case.execute(invalid_types_params) }.to raise_error(Arkham::Validators::Errors::ApiValidationError)
+          expect do
+            use_case.execute(invalid_types_params)
+          end.to raise_error(Arkham::Validators::Errors::ApiValidationError)
         end
       end
 
@@ -123,7 +129,9 @@ RSpec.describe Arkham::UseCases::CreatePatient do
         end
 
         it 'raises ApiValidationError' do
-          expect { use_case.execute(invalid_values_params) }.to raise_error(Arkham::Validators::Errors::ApiValidationError)
+          expect do
+            use_case.execute(invalid_values_params)
+          end.to raise_error(Arkham::Validators::Errors::ApiValidationError)
         end
       end
     end

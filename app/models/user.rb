@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
   GROUPS = %w[maintainer administrator nursing_leaders nursing_team employer].freeze
   PRIVILEGED_GROUPS = %w[administrator maintainer].freeze
