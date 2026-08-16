@@ -9,10 +9,7 @@ services:
     branch: main
     autoDeploy: false
     healthCheckPath: /up
-    dockerCommand: >-
-      bash -c "bin/rails db:prepare &&
-      rm -f tmp/pids/server.pid &&
-      bin/rails server -b 0.0.0.0"
+    dockerCommand: bin/docker-entrypoint ./bin/rails server
     envVars:
       - key: RAILS_ENV
         value: production

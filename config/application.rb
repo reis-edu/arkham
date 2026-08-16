@@ -12,12 +12,6 @@ module Arkham
 
     config.autoload_lib(ignore: %w[assets tasks])
 
-    config.eager_load_paths += %W[
-      #{config.root}/lib
-      #{config.root}/lib/arkham
-      #{config.root}/lib/validation
-    ]
-
     config.action_controller.allow_forgery_protection = false
 
     config.time_zone = 'Brasilia'
