@@ -15,8 +15,6 @@ services:
         value: production
       - key: RAILS_MAX_THREADS
         value: "5"
-      - key: SOLID_QUEUE_IN_PUMA
-        value: "true"
       - key: RAILS_MASTER_KEY
         sync: false
       - key: ARKHAM_DATABASE_HOST
