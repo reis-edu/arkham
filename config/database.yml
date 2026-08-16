@@ -17,26 +17,7 @@ test:
   password: arkham
 
 production:
-  primary:
-    <<: *default
-    database: <%= ENV['ARKHAM_DATABASE_NAME'] %>
-    username: <%= ENV['ARKHAM_DATABASE_USERNAME'] %>
-    password: <%= ENV['ARKHAM_DATABASE_PASSWORD'] %>
-  cache:
-    <<: *default
-    database: <%= ENV['ARKHAM_DATABASE_NAME'] %>
-    username: <%= ENV['ARKHAM_DATABASE_USERNAME'] %>
-    password: <%= ENV['ARKHAM_DATABASE_PASSWORD'] %>
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *default
-    database: <%= ENV['ARKHAM_DATABASE_NAME'] %>
-    username: <%= ENV['ARKHAM_DATABASE_USERNAME'] %>
-    password: <%= ENV['ARKHAM_DATABASE_PASSWORD'] %>
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *default
-    database: <%= ENV['ARKHAM_DATABASE_NAME'] %>
-    username: <%= ENV['ARKHAM_DATABASE_USERNAME'] %>
-    password: <%= ENV['ARKHAM_DATABASE_PASSWORD'] %>
-    migrations_paths: db/cable_migrate
+  <<: *default
+  database: <%= ENV['ARKHAM_DATABASE_NAME'] %>
+  username: <%= ENV['ARKHAM_DATABASE_USERNAME'] %>
+  password: <%= ENV['ARKHAM_DATABASE_PASSWORD'] %>
