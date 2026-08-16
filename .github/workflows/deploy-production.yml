@@ -16,13 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://dashboard.render.com/web/${{ secrets.RENDER_SERVICE_ID }}
+      url: https://dashboard.render.com/web/${{ vars.RENDER_SERVICE_ID }}
     steps:
       - name: Trigger Render deploy
         id: trigger
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+          RENDER_SERVICE_ID: ${{ vars.RENDER_SERVICE_ID }}
         run: |
           set -euo pipefail
 
@@ -47,7 +47,7 @@ jobs:
       - name: Aguardar conclusão do deploy
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+          RENDER_SERVICE_ID: ${{ vars.RENDER_SERVICE_ID }}
           DEPLOY_ID: ${{ steps.trigger.outputs.deploy_id }}
         run: |
           set -euo pipefail
