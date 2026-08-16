@@ -15,6 +15,8 @@ services:
         value: production
       - key: RAILS_MAX_THREADS
         value: "5"
+      - key: WEB_CONCURRENCY
+        value: "0"
       - key: RAILS_MASTER_KEY
         sync: false
       - key: ARKHAM_DATABASE_HOST
