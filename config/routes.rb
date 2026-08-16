@@ -3,6 +3,8 @@
 Rails.application.routes.draw do
   get 'up' => 'rails/health#show', as: :rails_health_check
 
+  get 'monitoring' => 'monitoring#show', defaults: { format: 'json' }
+
   namespace :visitors, defaults: { format: 'json' } do
     post '/login',                to: 'authentication#login'
     post '/new',                  to: 'visitors#create'
