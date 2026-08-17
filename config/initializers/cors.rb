@@ -2,7 +2,7 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins 'http://localhost:8080'
+    origins 'http://localhost:8080', 'https://marlene.dureis-dev.workers.dev'
     resource '*',
              headers: :any,
              methods: %i[get post put delete options head],
