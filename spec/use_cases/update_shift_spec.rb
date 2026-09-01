@@ -27,7 +27,8 @@ RSpec.describe Arkham::UseCases::UpdateShift do
       end
 
       it 'updates the shift title' do
-        expect(shift_repository).to receive(:update).with(shift_id, hash_including(title: 'Plantao diurno - Ala masculina'))
+        expect(shift_repository).to receive(:update)
+          .with(shift_id, hash_including(title: 'Plantao diurno - Ala masculina'))
         use_case.execute(shift_id, { title: 'Plantao diurno - Ala masculina' })
       end
 
