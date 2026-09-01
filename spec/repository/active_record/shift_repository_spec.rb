@@ -11,11 +11,16 @@ RSpec.describe Arkham::Repository::ActiveRecord::ShiftRepository do
       expect(Shift.exists?(id)).to eq(true)
     end
 
-    it 'raises ShiftInvalidError when a shift already exists for the same date and type' do
+    it 'creates the record with a title' do
+      id = repository.create(shift_date: Date.new(2026, 7, 28), shift_type: 'diurno', title: 'Ala feminina')
+      expect(Shift.find(id).title).to eq('Ala feminina')
+    end
+
+    it 'allows creating more than one shift for the same date and type' do
       create(:shift, shift_date: Date.new(2026, 7, 28), shift_type: 'diurno')
 
-      expect { repository.create(shift_date: Date.new(2026, 7, 28), shift_type: 'diurno') }
-        .to raise_error(Arkham::Domain::Errors::ShiftInvalidError)
+      id = repository.create(shift_date: Date.new(2026, 7, 28), shift_type: 'diurno')
+      expect(Shift.exists?(id)).to eq(true)
     end
   end
 
@@ -36,19 +41,6 @@ RSpec.describe Arkham::Repository::ActiveRecord::ShiftRepository do
 
     it 'returns nil when there is no match' do
       expect(repository.find_by_id(SecureRandom.uuid)).to be_nil
-    end
-  end
-
-  describe '#find_by_date_and_type' do
-    it 'returns the matching entity' do
-      shift = create(:shift, shift_date: Date.new(2026, 3, 1), shift_type: 'noturno')
-      found = repository.find_by_date_and_type(Date.new(2026, 3, 1), 'noturno')
-
-      expect(found.id).to eq(shift.id)
-    end
-
-    it 'returns nil when there is no match' do
-      expect(repository.find_by_date_and_type(Date.new(2026, 3, 1), 'noturno')).to be_nil
     end
   end
 

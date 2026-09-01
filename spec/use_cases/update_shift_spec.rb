@@ -15,16 +15,25 @@ RSpec.describe Arkham::UseCases::UpdateShift do
   end
 
   describe '#execute' do
-    context 'when params are valid and there is no conflict' do
+    context 'when params are valid' do
       before do
         allow(shift_repository).to receive(:find_by_id).with(shift_id).and_return(shift)
-        allow(shift_repository).to receive(:find_by_date_and_type).and_return(nil)
         allow(shift_repository).to receive(:update).and_return(shift_id)
       end
 
       it 'updates the shift' do
         expect(shift_repository).to receive(:update).with(shift_id, hash_including(shift_type: 'noturno'))
         use_case.execute(shift_id, { shift_type: 'noturno' })
+      end
+
+      it 'updates the shift title' do
+        expect(shift_repository).to receive(:update).with(shift_id, hash_including(title: 'Plantao diurno - Ala masculina'))
+        use_case.execute(shift_id, { title: 'Plantao diurno - Ala masculina' })
+      end
+
+      it 'allows updating to the same date and type as another existing shift' do
+        expect(shift_repository).to receive(:update).with(shift_id, hash_including(shift_type: 'diurno'))
+        use_case.execute(shift_id, { shift_type: 'diurno' })
       end
     end
 
@@ -35,33 +44,6 @@ RSpec.describe Arkham::UseCases::UpdateShift do
         expect do
           use_case.execute(shift_id, { shift_type: 'noturno' })
         end.to raise_error(Arkham::Domain::Errors::ShiftNotFoundError)
-      end
-    end
-
-    context 'when another shift already exists for the resulting date and type' do
-      before do
-        allow(shift_repository).to receive(:find_by_id).with(shift_id).and_return(shift)
-        allow(shift_repository).to receive(:find_by_date_and_type)
-          .and_return(Arkham::Domain::Entities::Shift.new(id: 'other-id'))
-      end
-
-      it 'raises ShiftAlreadyExistsError' do
-        expect(shift_repository).not_to receive(:update)
-        expect do
-          use_case.execute(shift_id, { shift_type: 'noturno' })
-        end.to raise_error(Arkham::Domain::Errors::ShiftAlreadyExistsError)
-      end
-    end
-
-    context 'when the conflicting shift found is the shift itself' do
-      before do
-        allow(shift_repository).to receive(:find_by_id).with(shift_id).and_return(shift)
-        allow(shift_repository).to receive(:find_by_date_and_type).and_return(shift)
-        allow(shift_repository).to receive(:update).and_return(shift_id)
-      end
-
-      it 'does not raise and proceeds with the update' do
-        expect { use_case.execute(shift_id, { shift_type: 'diurno' }) }.not_to raise_error
       end
     end
   end

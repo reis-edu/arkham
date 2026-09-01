@@ -11,7 +11,6 @@ class Shift < ApplicationRecord
   validates :shift_date, presence: true
   validates :shift_type, presence: true, inclusion: { in: TYPES }
   validates :status, presence: true, inclusion: { in: STATUSES }
-  validates :shift_date, uniqueness: { scope: :shift_type }
 
   def open?
     status == 'open'

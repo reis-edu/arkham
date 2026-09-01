@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_28_140002) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_01_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -99,7 +99,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_140002) do
     t.uuid "review_finalized_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["shift_date", "shift_type"], name: "index_shifts_on_shift_date_and_shift_type", unique: true
+    t.string "title"
+    t.index ["shift_date", "shift_type"], name: "index_shifts_on_shift_date_and_shift_type"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

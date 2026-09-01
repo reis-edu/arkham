@@ -166,14 +166,30 @@ RSpec.describe Api::ShiftsController, type: :controller do
           expect(response).to have_http_status(:not_found)
         end
 
-        it 'returns unprocessable_entity for a duplicate date/type' do
+        it 'allows creating more than one shift for the same date and type' do
           create(:shift, shift_date: Date.new(2026, 8, 1), shift_type: 'diurno')
           item = create(:shift_item)
 
           post :create, params: {
             shift: { shift_date: '2026-08-01', shift_type: 'diurno', shift_item_ids: [item.id] }
           }, as: :json
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:ok)
+          expect(Shift.where(shift_date: Date.new(2026, 8, 1), shift_type: 'diurno').count).to eq(2)
+        end
+
+        it 'creates a shift with a title' do
+          item = create(:shift_item)
+
+          post :create, params: {
+            shift: {
+              shift_date: '2026-08-01', shift_type: 'diurno', shift_item_ids: [item.id],
+              title: 'Plantao noturno - Ala feminina'
+            }
+          }, as: :json
+
+          expect(response).to have_http_status(:ok)
+          shift_id = JSON.parse(response.body)['id']
+          expect(Shift.find(shift_id).title).to eq('Plantao noturno - Ala feminina')
         end
 
         it 'copies the items from the last shift of the same type' do

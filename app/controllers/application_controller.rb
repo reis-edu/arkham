@@ -70,10 +70,6 @@ class ApplicationController < ActionController::Base
     render json: { error: e.message }, status: :not_found
   end
 
-  rescue_from Arkham::Domain::Errors::ShiftAlreadyExistsError do |e|
-    render json: { error: e.message }, status: :unprocessable_entity
-  end
-
   rescue_from Arkham::Domain::Errors::ShiftInvalidError do |e|
     render json: { error: e.message }, status: :unprocessable_entity
   end

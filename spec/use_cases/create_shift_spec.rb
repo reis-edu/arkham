@@ -16,15 +16,21 @@ RSpec.describe Arkham::UseCases::CreateShift do
   describe '#execute' do
     context 'when params are valid and the items exist' do
       before do
-        allow(shift_repository).to receive(:find_by_date_and_type).and_return(nil)
         allow(shift_item_repository).to receive(:all_exist?).with(%w[item-1 item-2]).and_return(true)
         allow(shift_repository).to receive(:create).and_return('shift-id')
         allow(shift_item_check_repository).to receive(:snapshot_for_shift)
       end
 
-      it 'creates the shift with only the given date and type (no item ids leak into the shift record)' do
-        expect(shift_repository).to receive(:create).with(shift_date: '2026-07-28', shift_type: 'diurno')
+      it 'creates the shift with the given date, type and title (no item ids leak into the shift record)' do
+        expect(shift_repository).to receive(:create)
+          .with(shift_date: '2026-07-28', shift_type: 'diurno', title: nil)
         expect(use_case.execute(valid_params)).to eq('shift-id')
+      end
+
+      it 'creates the shift with the given title' do
+        expect(shift_repository).to receive(:create)
+          .with(shift_date: '2026-07-28', shift_type: 'diurno', title: 'Plantao noturno - Ala feminina')
+        use_case.execute(valid_params.merge(title: 'Plantao noturno - Ala feminina'))
       end
 
       it 'snapshots a check for exactly the given items' do
@@ -38,21 +44,8 @@ RSpec.describe Arkham::UseCases::CreateShift do
       end
     end
 
-    context 'when a shift already exists for the same date and type' do
-      before do
-        allow(shift_repository).to receive(:find_by_date_and_type)
-          .and_return(Arkham::Domain::Entities::Shift.new(id: 'other-id'))
-      end
-
-      it 'raises ShiftAlreadyExistsError and does not create anything' do
-        expect(shift_repository).not_to receive(:create)
-        expect { use_case.execute(valid_params) }.to raise_error(Arkham::Domain::Errors::ShiftAlreadyExistsError)
-      end
-    end
-
     context 'when one of the given item ids does not exist' do
       before do
-        allow(shift_repository).to receive(:find_by_date_and_type).and_return(nil)
         allow(shift_item_repository).to receive(:all_exist?).and_return(false)
       end
 

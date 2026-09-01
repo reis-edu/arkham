@@ -33,13 +33,6 @@ module Arkham
           map_to_entity(shift)
         end
 
-        def find_by_date_and_type(shift_date, shift_type)
-          shift = ::Shift.find_by(shift_date: shift_date, shift_type: shift_type)
-          return nil unless shift
-
-          map_to_entity(shift)
-        end
-
         def find_last_by_type(shift_type)
           shift = ::Shift.where(shift_type: shift_type).order(shift_date: :desc, created_at: :desc).first
           return nil unless shift
@@ -100,6 +93,7 @@ module Arkham
             id: shift.id,
             shift_date: shift.shift_date,
             shift_type: shift.shift_type,
+            title: shift.title,
             status: shift.status,
             execution_note: shift.execution_note,
             execution_finalized_at: shift.execution_finalized_at,

@@ -7,6 +7,7 @@ module Arkham
         params do
           optional(:shift_date).maybe(:str?)
           optional(:shift_type).maybe(:str?)
+          optional(:title).maybe(:str?)
         end
 
         rule(:shift_type) do

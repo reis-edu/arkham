@@ -14,6 +14,7 @@ module Arkham
               id: shift.id,
               shift_date: shift.shift_date,
               shift_type: shift.shift_type,
+              title: shift.title,
               status: shift.status,
               execution_finalized_at: shift.execution_finalized_at,
               review_finalized_at: shift.review_finalized_at

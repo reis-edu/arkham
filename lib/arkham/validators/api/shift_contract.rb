@@ -8,6 +8,7 @@ module Arkham
           required(:shift_date).filled(:str?)
           required(:shift_type).filled(:str?)
           required(:shift_item_ids).array(:str?)
+          optional(:title).maybe(:str?)
         end
 
         rule(:shift_type) do
